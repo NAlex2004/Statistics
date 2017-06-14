@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity.Owin;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -8,8 +9,14 @@ namespace Statistics.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public async System.Threading.Tasks.Task<ActionResult> Index()
         {
+            Identity.AppUserManager manager = HttpContext.GetOwinContext().GetUserManager<Identity.AppUserManager>();
+            Identity.AppUser user = new Identity.AppUser()
+            {
+                UserName = "Test"
+            };
+            var result = await manager.CreateAsync(user);
             return View();
         }
 
