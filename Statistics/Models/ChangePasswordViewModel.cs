@@ -20,5 +20,7 @@ namespace Statistics.Models
         [DataType(DataType.Password)]
         [Compare(otherProperty: "Password", ErrorMessage = "Passwords are not equal.")]
         public string PasswordConfirm { get; set; }
+        
+        public string ReturnUrl { get; set; }        
     }
 }

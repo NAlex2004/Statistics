@@ -10,27 +10,30 @@ using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Statistics.Controllers
 {
     [Authorize]
     public class AccountController : Controller
-    {        
-        private AppUserManager UserManager
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().GetUserManager<AppUserManager>();                
-            }
-        }
+    {
+        //private AppUserManager UserManager
+        //{
+        //    get
+        //    {
+        //        return HttpContext.GetOwinContext().GetUserManager<AppUserManager>();                
+        //    }
+        //}
 
-        private IAuthenticationManager AuthenticationManager
-        {
-            get
-            {
-                return HttpContext.GetOwinContext().Authentication;
-            }
-        }
+        //private IAuthenticationManager AuthenticationManager
+        //{
+        //    get
+        //    {
+        //        return HttpContext.GetOwinContext().Authentication;
+        //    }
+        //}
+
+        private AccountManager _accountManager = new AccountManager();
 
         [AllowAnonymous]
         [HttpGet]
@@ -43,7 +46,7 @@ namespace Statistics.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async System.Threading.Tasks.Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
         {
             ViewBag.returnUrl = returnUrl;
 
@@ -52,59 +55,67 @@ namespace Statistics.Controllers
                 model.Password = "";
                 return View(model);
             }
-            
-            AppUser user = UserManager.Find(model.UserName, model.Password);
-            if (user != null)
+
+            bool success = await _accountManager.SignIn(HttpContext.GetOwinContext(), model);
+
+            if (!success)
             {
-                AuthenticationManager.SignOut();
-                AuthenticationProperties props = new AuthenticationProperties()
-                {
-                    IsPersistent = true
-                };
-                ClaimsIdentity claim = await UserManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
-                AuthenticationManager.SignIn(props, claim);
-
-                if (string.IsNullOrEmpty(returnUrl))
-                    return RedirectToAction("Index", "Home");
-
-                return Redirect(returnUrl);
+                ModelState.AddModelError("", "Login or password incorrect.");
+                model.Password = "";
+                return View(model);
             }
 
-            ModelState.AddModelError("", "Login or password incorrect.");
-            model.Password = "";
-            return View(model);
+            if (string.IsNullOrEmpty(returnUrl))
+                return RedirectToAction("Index", "Home");
+
+            return Redirect(returnUrl);                        
         }
 
         
         public ActionResult Logout()
         {
-            AuthenticationManager.SignOut();
+            _accountManager.SignOut(HttpContext.GetOwinContext());
             return RedirectToAction("Login", "Account");
         }
 
         [HttpGet]
-        public async System.Threading.Tasks.Task<ActionResult> ChangePassword()
+        public async Task<ActionResult> ChangePassword(string returnUrl)
         {
-            AppUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            AppUser user = await _accountManager.GetCurrentUser(HttpContext.GetOwinContext());
+
             ChangePasswordViewModel model = new ChangePasswordViewModel()
             {
-                UserName = user.UserName
+                UserName = user.UserName,
+                ReturnUrl = returnUrl
             };
+            
             return View(model);
         }
 
         [HttpPost]
-        public ActionResult ChangePassword(ChangePasswordViewModel model)
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ChangePassword(ChangePasswordViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (!ModelState.IsValid || !ModelsValidator.IsValid(model))
             {
-                model.Password = "";
-                model.OldPassword = "";
-                model.PasswordConfirm = "";
+                model.Password = model.OldPassword = model.PasswordConfirm = "";                
                 return View(model);
             }
 
-            if (model.PasswordConfirm.Equals(model.Password))
+            IdentityResult res = await _accountManager.ChangePassword(HttpContext.GetOwinContext(), model);
+
+            if (!res.Succeeded)
+            {
+                foreach (var error in res.Errors)
+                    ModelState.AddModelError("", error);
+                model.Password = model.OldPassword = model.PasswordConfirm = "";
+                return View(model);
+            }
+
+            if (!string.IsNullOrEmpty(model.ReturnUrl))
+                return Redirect(model.ReturnUrl);
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }
