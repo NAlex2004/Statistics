@@ -13,6 +13,7 @@ using System.Security.Claims;
 
 namespace Statistics.Controllers
 {
+    [Authorize]
     public class AccountController : Controller
     {        
         private AppUserManager UserManager
@@ -31,6 +32,7 @@ namespace Statistics.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult Login(string returnUrl)
         {
@@ -38,6 +40,7 @@ namespace Statistics.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async System.Threading.Tasks.Task<ActionResult> Login(LoginViewModel model, string returnUrl)
@@ -49,7 +52,7 @@ namespace Statistics.Controllers
                 model.Password = "";
                 return View(model);
             }
-
+            
             AppUser user = UserManager.Find(model.UserName, model.Password);
             if (user != null)
             {
@@ -79,5 +82,29 @@ namespace Statistics.Controllers
             return RedirectToAction("Login", "Account");
         }
 
+        [HttpGet]
+        public async System.Threading.Tasks.Task<ActionResult> ChangePassword()
+        {
+            AppUser user = await UserManager.FindByIdAsync(User.Identity.GetUserId());
+            ChangePasswordViewModel model = new ChangePasswordViewModel()
+            {
+                UserName = user.UserName
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public ActionResult ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                model.Password = "";
+                model.OldPassword = "";
+                model.PasswordConfirm = "";
+                return View(model);
+            }
+
+            if (model.PasswordConfirm.Equals(model.Password))
+        }
     }
 }
