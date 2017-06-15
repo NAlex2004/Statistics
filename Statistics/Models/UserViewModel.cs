@@ -20,6 +20,7 @@ namespace Statistics.Models
         public string Password { get; set; }
         [Required]
         [DataType(DataType.Password)]
+        [Compare(otherProperty: "Password", ErrorMessage = "Passwords are not equal")]
         public string PasswordConfirm { get; set; }
         public IDictionary<IRole, bool> Roles { get; set; }
     }

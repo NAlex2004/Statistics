@@ -29,6 +29,8 @@ namespace Statistics.Identity
                 };
                 ClaimsIdentity claim = await userManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
                 authentication.SignIn(props, claim);
+                
+                return true;
             }
             return false;
         }
@@ -51,9 +53,14 @@ namespace Statistics.Identity
             AppUser user = userManager.Find(model.UserName, model.OldPassword);
             if (user == null)
                 return new IdentityResult("User is null");
-
+            
             IdentityResult res = await userManager.ChangePasswordAsync(user.Id, model.OldPassword, model.Password);
             return res;
+        }
+
+        public IdentityResult CreateUser(IOwinContext owinContext, UserViewModel userModel)
+        {
+
         }
     }
 }

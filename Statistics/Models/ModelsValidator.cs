@@ -16,5 +16,15 @@ namespace Statistics.Models
                     && model.OldPassword.Equals(model.PasswordConfirm)
                 : false;
         }
+
+        public static bool IsValid(UserViewModel model)
+        {
+            return model != null
+                ? !string.IsNullOrEmpty(model.UserName)
+                    && !string.IsNullOrEmpty(model.LastName)
+                    && !string.IsNullOrEmpty(model.Password)
+                    && model.Password.Equals(model.PasswordConfirm)
+                : false;
+        }
     }
 }
