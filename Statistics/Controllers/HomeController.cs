@@ -5,18 +5,20 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
+
 namespace Statistics.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
-        public async System.Threading.Tasks.Task<ActionResult> Index()
+        public ActionResult Index()
         {
-            Identity.AppUserManager manager = HttpContext.GetOwinContext().GetUserManager<Identity.AppUserManager>();
-            Identity.AppUser user = new Identity.AppUser()
-            {
-                UserName = "Test"
-            };
-            var result = await manager.CreateAsync(user);
+            //Identity.AppUserManager manager = HttpContext.GetOwinContext().GetUserManager<Identity.AppUserManager>();
+            //Identity.AppUser user = new Identity.AppUser()
+            //{
+            //    UserName = "Test"
+            //};
+            
             return View();
         }
 

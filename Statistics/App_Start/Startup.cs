@@ -5,6 +5,7 @@ using Owin;
 using Statistics.Identity;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 [assembly: OwinStartup(typeof(Statistics.App_Start.Startup))]
 
@@ -16,7 +17,7 @@ namespace Statistics.App_Start
         {
             app.CreatePerOwinContext<AppDbContext>(AppDbContext.Create);
             app.CreatePerOwinContext<AppUserManager>(AppUserManager.Create);
-            app.CreatePerOwinContext<AppRoleManager>(AppRoleManager.Create);
+            app.CreatePerOwinContext<AppRoleManager>(AppRoleManager.Create);            
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             { 
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,

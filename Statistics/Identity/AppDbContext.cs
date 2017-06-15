@@ -14,7 +14,7 @@ namespace Statistics.Identity
         }
 
         public static AppDbContext Create()
-        {
+        {            
             return new AppDbContext();
         }
     }
