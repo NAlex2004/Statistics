@@ -56,7 +56,7 @@ namespace Statistics.Controllers
                 return View(model);
             }
 
-            bool success = await _accountManager.SignIn(HttpContext.GetOwinContext(), model);
+            bool success = _accountManager.SignIn(HttpContext.GetOwinContext(), model);
 
             if (!success)
             {

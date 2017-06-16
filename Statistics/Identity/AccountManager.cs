@@ -15,7 +15,28 @@ namespace Statistics.Identity
 {
     public class AccountManager
     {
+        public IQueryable<UserViewModel> GetUsers(IOwinContext owinContext)
+        {
+            AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
+            AppRoleManager roleManager = owinContext.GetUserManager<AppRoleManager>();
 
+            var users = userManager.Users.Select(u => new UserViewModel()
+            {
+                UserName = u.UserName,
+                LastName = u.LastName,
+                Email = u.Email,
+                Roles = u.Roles.SelectMany(ur => roleManager.Roles.Where(r => r.Id.Equals(ur.RoleId))//.DefaultIfEmpty(),
+                    .Select(r => new KeyValuePair<string, bool>(r.Name, true)).AsEnumerable())
+                   // (ur, r) => new KeyValuePair<string, bool>(r.Name, true))
+            });
+
+            return users;
+        }
+
+        public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, Func<UserViewModel, bool> condition)
+        {
+            return GetUsers(owinContext).Where(condition);
+        }
 
         public bool SignIn(IOwinContext owinContext, LoginViewModel loginModel)
         {
@@ -77,7 +98,7 @@ namespace Statistics.Identity
             {                
                 foreach (var roleEntry in userModel.Roles.Where(r => r.Value))
                 {
-                    res = userManager.AddToRole(user.Id, roleEntry.Key.Name);
+                    res = userManager.AddToRole(user.Id, roleEntry.Key);
                     if (!res.Succeeded)
                         break;
                 }
@@ -98,7 +119,7 @@ namespace Statistics.Identity
                 user.Email = userModel.Email;
 
                 var existingRoles = userManager.GetRoles(user.Id);
-                var newRoles = userModel.Roles.Where(r => r.Value).Select(r => r.Key.Name);
+                var newRoles = userModel.Roles.Where(r => r.Value).Select(r => r.Key);
                 var rolesToRemove = existingRoles.Except(newRoles);
                 var rolesToAdd = newRoles.Except(existingRoles);
 
