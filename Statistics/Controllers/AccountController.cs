@@ -105,5 +105,29 @@ namespace Statistics.Controllers
 
             return RedirectToAction("Index", "Home");
         }
+
+        [Authorize(Roles = "administrator")]
+        public ActionResult EditUser(string userName)
+        {
+
+        }
+
+        [Authorize(Roles = "administrator")]
+        public ActionResult Users()
+        {
+
+        }
+
+        [Authorize(Roles = "administrator")]
+        public ActionResult CreateUser()
+        {
+
+        }
+
+        [Authorize(Roles = "administrator")]
+        public ActionResult DeleteUser(string userName)
+        {
+
+        }
     }
 }
