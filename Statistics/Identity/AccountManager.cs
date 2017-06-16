@@ -172,5 +172,14 @@ namespace Statistics.Identity
             AppUser user = userManager.FindByName(userModel.UserName);
             return userManager.Delete(user);
         }
+
+        public bool IsAdmin(IOwinContext owinContext, string userName)
+        {
+            if (string.IsNullOrEmpty(userName))
+                return false;
+            AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();                        
+            var user = userManager.FindByName(userName);
+            return userManager.IsInRole(user.Id, "administrators");
+        }
     }
 }
