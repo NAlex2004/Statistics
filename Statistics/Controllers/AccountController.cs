@@ -79,13 +79,13 @@ namespace Statistics.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult> ChangePassword(string returnUrl)
-        {
-            AppUser user = await _accountManager.GetCurrentUser(HttpContext.GetOwinContext());
-
+        public ActionResult ChangePassword(string returnUrl)
+        {            
+            //AppUser user = await _accountManager.GetCurrentUserAsync(HttpContext.GetOwinContext());
+            
             ChangePasswordViewModel model = new ChangePasswordViewModel()
             {
-                UserName = user.UserName,
+                UserName = User.Identity.Name, //user.UserName,
                 ReturnUrl = returnUrl
             };
             
@@ -94,7 +94,7 @@ namespace Statistics.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> ChangePassword(ChangePasswordViewModel model)
+        public ActionResult ChangePassword(ChangePasswordViewModel model)
         {
             if (!ModelState.IsValid || !ModelsValidator.IsValid(model))
             {
@@ -102,7 +102,7 @@ namespace Statistics.Controllers
                 return View(model);
             }
 
-            IdentityResult res = await _accountManager.ChangePassword(HttpContext.GetOwinContext(), model);
+            IdentityResult res = _accountManager.ChangePassword(HttpContext.GetOwinContext(), model);
 
             if (!res.Succeeded)
             {

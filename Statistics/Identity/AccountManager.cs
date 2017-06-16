@@ -9,12 +9,15 @@ using System.Linq;
 using System.Security.Claims;
 using System.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Statistics.Identity
 {
     public class AccountManager
     {
-        public async Task<bool> SignIn(IOwinContext owinContext, LoginViewModel loginModel)
+
+
+        public bool SignIn(IOwinContext owinContext, LoginViewModel loginModel)
         {
             AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
             IAuthenticationManager authentication = owinContext.Authentication;
@@ -27,7 +30,7 @@ namespace Statistics.Identity
                 {
                     IsPersistent = true
                 };
-                ClaimsIdentity claim = await userManager.CreateIdentityAsync(user, DefaultAuthenticationTypes.ApplicationCookie);
+                ClaimsIdentity claim = userManager.CreateIdentity(user, DefaultAuthenticationTypes.ApplicationCookie);
                 authentication.SignIn(props, claim);
                 
                 return true;
@@ -40,27 +43,113 @@ namespace Statistics.Identity
             owinContext.Authentication.SignOut();
         }
 
-        public async Task<AppUser> GetCurrentUser(IOwinContext owinContext)
-        {
-            var id = owinContext.Authentication.User.Identity.GetUserId();
-            AppUser user = await owinContext.GetUserManager<AppUserManager>().FindByIdAsync(id);
-            return user;
-        }
+        //public async Task<AppUser> GetCurrentUserAsync(IOwinContext owinContext)
+        //{
+        //    var id = owinContext.Authentication.User.Identity.GetUserId();
+        //    AppUser user = await owinContext.GetUserManager<AppUserManager>().FindByIdAsync(id);
+        //    return user;
+        //}   
 
-        public async Task<IdentityResult> ChangePassword(IOwinContext owinContext, ChangePasswordViewModel model)
+        public IdentityResult ChangePassword(IOwinContext owinContext, ChangePasswordViewModel model)
         {
             AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
             AppUser user = userManager.Find(model.UserName, model.OldPassword);
             if (user == null)
-                return new IdentityResult("User is null");
+                return new IdentityResult("User not found");
             
-            IdentityResult res = await userManager.ChangePasswordAsync(user.Id, model.OldPassword, model.Password);
+            IdentityResult res = userManager.ChangePassword(user.Id, model.OldPassword, model.Password);
             return res;
         }
 
         public IdentityResult CreateUser(IOwinContext owinContext, UserViewModel userModel)
         {
+            AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
+            AppUser user = new AppUser()
+            {
+                UserName = userModel.UserName,
+                LastName = userModel.LastName,
+                Email = userModel.Email
+            };
 
+            IdentityResult res = userManager.Create(user, userModel.Password);
+
+            if (res.Succeeded)
+            {                
+                foreach (var roleEntry in userModel.Roles.Where(r => r.Value))
+                {
+                    res = userManager.AddToRole(user.Id, roleEntry.Key.Name);
+                    if (!res.Succeeded)
+                        break;
+                }
+            }
+
+            return res;
+        }
+
+        public IdentityResult UpdateUser(IOwinContext owinContext, UserViewModel userModel)
+        {
+            AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
+            AppUser user = userManager.FindByName(userModel.UserName);
+            var context = owinContext.Get<AppDbContext>();
+            
+            if (user != null)
+            {
+                user.LastName = userModel.LastName;
+                user.Email = userModel.Email;
+
+                var existingRoles = userManager.GetRoles(user.Id);
+                var newRoles = userModel.Roles.Where(r => r.Value).Select(r => r.Key.Name);
+                var rolesToRemove = existingRoles.Except(newRoles);
+                var rolesToAdd = newRoles.Except(existingRoles);
+
+                var tran = context.Database.BeginTransaction();
+                
+                IdentityResult result = userManager.Update(user);
+
+                // !!! ??? 
+
+                if (result.Succeeded)
+                {
+                    result = userManager.ResetPassword(user.Id, userManager.GeneratePasswordResetToken(user.Id), userModel.Password);
+
+                    if (result.Succeeded)
+                    {
+                        foreach (var role in rolesToRemove)
+                        {
+                            result = userManager.RemoveFromRole(user.Id, role);
+                            if (!result.Succeeded)
+                                break;
+                        }
+
+                        if (result.Succeeded)
+                        {
+                            foreach (var role in rolesToAdd)
+                            {
+                                result = userManager.AddToRole(user.Id, role);
+                                if (!result.Succeeded)
+                                    break;
+                            }
+                        }
+
+                        if (result.Succeeded)
+                            tran.Commit();
+                        else
+                            tran.Rollback();
+                        
+                    }
+                }
+
+                return result;
+            }
+
+            return new IdentityResult("User not found");
+        }
+
+        public IdentityResult DeleteUser(IOwinContext owinContext, UserViewModel userModel)
+        {
+            AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
+            AppUser user = userManager.FindByName(userModel.UserName);
+            return userManager.Delete(user);
         }
     }
 }
