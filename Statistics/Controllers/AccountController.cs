@@ -80,12 +80,16 @@ namespace Statistics.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ChangePassword(ChangePasswordViewModel model)
         {
-            if (!ModelState.IsValid || !ModelsValidator.IsValid(model))
+            string currentUserName = User.Identity.Name;
+
+            if (!ModelState.IsValid || !ModelsValidator.IsValid(model)
+                ||
+                ( !currentUserName.Equals(model.UserName) && !_accountManager.IsAdmin(HttpContext.GetOwinContext(), currentUserName) ))
             {
                 model.Password = model.OldPassword = model.PasswordConfirm = "";                
                 return View(model);
             }
-
+            
             IdentityResult res = _accountManager.ChangePassword(HttpContext.GetOwinContext(), model);
 
             if (!res.Succeeded)
