@@ -17,22 +17,6 @@ namespace Statistics.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        //private AppUserManager UserManager
-        //{
-        //    get
-        //    {
-        //        return HttpContext.GetOwinContext().GetUserManager<AppUserManager>();                
-        //    }
-        //}
-
-        //private IAuthenticationManager AuthenticationManager
-        //{
-        //    get
-        //    {
-        //        return HttpContext.GetOwinContext().Authentication;
-        //    }
-        //}
-
         private AccountManager _accountManager = new AccountManager();
 
         [AllowAnonymous]
@@ -46,7 +30,7 @@ namespace Statistics.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model, string returnUrl)
+        public ActionResult Login(LoginViewModel model, string returnUrl)
         {
             ViewBag.returnUrl = returnUrl;
 
