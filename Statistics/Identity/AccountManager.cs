@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Linq.Expressions;
 
 namespace Statistics.Identity
 {
@@ -22,6 +23,7 @@ namespace Statistics.Identity
 
             var users = userManager.Users.Select(u => new UserViewModel()
             {
+                Id = u.Id,
                 UserName = u.UserName,
                 LastName = u.LastName,
                 Email = u.Email,
@@ -29,13 +31,34 @@ namespace Statistics.Identity
                     .Select(r => new KeyValuePair<string, bool>(r.Name, true)).AsEnumerable())
                    // (ur, r) => new KeyValuePair<string, bool>(r.Name, true))
             });
-
-            return users;
+            
+            return users;            
         }
 
-        public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, Func<UserViewModel, bool> condition)
+        public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, PagerData pager)
         {
-            return GetUsers(owinContext).Where(condition);
+            if (pager == null)
+                return GetUsers(owinContext);
+
+            return GetUsersPage(GetUsers(owinContext), pager);
+        }
+
+        protected IEnumerable<UserViewModel> GetUsersPage(IQueryable<UserViewModel> query, PagerData pager)
+        {
+            int total = query.Count();
+            int rest = total % pager.ItemsPerPage;
+            pager.TotalPages = total / pager.ItemsPerPage + (rest > 0 ? 1 : 0);
+            int skip = pager.ItemsPerPage * (pager.CurrentPage - 1);
+
+            return query.Skip(skip).Take(pager.ItemsPerPage);
+        }
+
+        public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, Expression<Func<UserViewModel, bool>> condition, PagerData pager = null)
+        {
+            var query = GetUsers(owinContext).Where(condition);
+            if (pager == null)
+                return query;
+            return GetUsersPage(query, pager);            
         }
 
         public bool SignIn(IOwinContext owinContext, LoginViewModel loginModel)

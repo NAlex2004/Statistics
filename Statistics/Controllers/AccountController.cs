@@ -107,15 +107,33 @@ namespace Statistics.Controllers
         }
 
         [Authorize(Roles = "administrator")]
-        public ActionResult EditUser(string userName)
+        public ActionResult EditUser(string id)
         {
 
         }
 
         [Authorize(Roles = "administrator")]
-        public ActionResult Users()
+        public ActionResult Users(int? page = null)
         {
+            PagerData pager = new PagerData()
+            {
+                ItemsPerPage = MvcApplication.ItemsPerPage,
+                CurrentPage = page ?? 1
+            };
 
+            UsersListViewModel users = new UsersListViewModel()
+            {
+                Pager = pager,
+                Users = _accountManager.GetUsers(HttpContext.GetOwinContext(), pager)
+            };
+            
+            return View(users);
+        }
+
+        [Authorize(Roles = "administrator")]
+        public PartialViewResult OneUser(UserViewModel model)
+        {
+            return PartialView(model);
         }
 
         [Authorize(Roles = "administrator")]
@@ -125,7 +143,7 @@ namespace Statistics.Controllers
         }
 
         [Authorize(Roles = "administrator")]
-        public ActionResult DeleteUser(string userName)
+        public ActionResult DeleteUser(string id)
         {
 
         }
