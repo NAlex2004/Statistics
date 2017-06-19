@@ -1,0 +1,19 @@
+﻿@model Statistics.Models.UsersListViewModel
+
+@{
+    ViewBag.Title = "Users";
+}
+
+<h2>Users</h2>
+
+<div class="item">
+    @Html.ActionLink("Create user", "CreateUser")
+</div>
+
+@foreach (var user in Model.Users)
+{
+    <div class="form-horizontal">
+        Html.RenderPartial("OneUser", user)
+    </div>
+}
+

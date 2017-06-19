@@ -109,7 +109,7 @@ namespace Statistics.Controllers
         [Authorize(Roles = "administrator")]
         public ActionResult EditUser(string id)
         {
-
+            return View();
         }
 
         [Authorize(Roles = "administrator")]
@@ -139,13 +139,13 @@ namespace Statistics.Controllers
         [Authorize(Roles = "administrator")]
         public ActionResult CreateUser()
         {
-
+            return View();
         }
 
         [Authorize(Roles = "administrator")]
         public ActionResult DeleteUser(string id)
         {
-
+            return View();
         }
     }
 }
