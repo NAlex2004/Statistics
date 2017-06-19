@@ -115,6 +115,24 @@ namespace Statistics.Controllers
         [Authorize(Roles = "administrators")]
         public ActionResult Users(int? page = null)
         {
+            //PagerData pager = new PagerData()
+            //{
+            //    ItemsPerPage = MvcApplication.ItemsPerPage,
+            //    CurrentPage = page ?? 1
+            //};
+
+            //UsersListViewModel users = new UsersListViewModel()
+            //{
+            //    Pager = pager,
+            //    Users = _accountManager.GetUsers(HttpContext.GetOwinContext(), pager)
+            //};
+            
+            return View(page);
+        }
+
+        [Authorize(Roles = "administrators")]
+        public PartialViewResult UsersData(int? page = null)
+        {
             PagerData pager = new PagerData()
             {
                 ItemsPerPage = MvcApplication.ItemsPerPage,
@@ -126,8 +144,8 @@ namespace Statistics.Controllers
                 Pager = pager,
                 Users = _accountManager.GetUsers(HttpContext.GetOwinContext(), pager)
             };
-            
-            return View(users);
+
+            return PartialView(users);
         }
 
         [Authorize(Roles = "administrators")]

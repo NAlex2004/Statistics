@@ -17,7 +17,7 @@ namespace Statistics.Models
             set
             {
                 _totalPages = Math.Max(1, value);
-                _currentPage = Math.Max(1, Math.Min(value, _totalPages));
+                _currentPage = Math.Min(_currentPage, _totalPages);
             }
         }
 

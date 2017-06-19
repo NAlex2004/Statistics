@@ -36,32 +36,37 @@ namespace Statistics.Identity
             return users;
         }
 
-        public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, PagerData pager = null)
+        public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, 
+            PagerData pager = null, Expression<Func<IQueryable<UserViewModel>, IOrderedQueryable<UserViewModel>>> orderBy = null)
         {
-            if (pager == null)
-                return GetUsers(owinContext);
+            var query = orderBy == null ? GetUsers(owinContext).OrderBy(u => u.UserName) : orderBy.Compile()(GetUsers(owinContext));
 
-            return GetUsersPage(GetUsers(owinContext), pager);
+            if (pager == null)
+                return query;
+
+            return GetUsersPage(query, pager);
         }
 
         protected IEnumerable<UserViewModel> GetUsersPage(IQueryable<UserViewModel> query, PagerData pager)
         {
-            int skip = pager.ItemsPerPage * (pager.CurrentPage - 1);
-            var page = query.OrderBy(x => x.UserName).Skip(skip).Take(pager.ItemsPerPage);
-
-            int total = page.Count();
+            int total = query.Count();
             int rest = total % pager.ItemsPerPage;
             pager.TotalPages = total / pager.ItemsPerPage + (rest > 0 ? 1 : 0);
-
+            int skip = pager.ItemsPerPage * (pager.CurrentPage - 1);
+            var page = query.Skip(skip).Take(pager.ItemsPerPage);            
+            
             return page;
         }
 
-        public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, Expression<Func<UserViewModel, bool>> condition, PagerData pager = null)
+        public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, Expression<Func<UserViewModel, bool>> condition,
+            PagerData pager = null, Expression < Func<IQueryable<UserViewModel>, IOrderedQueryable<UserViewModel>>> orderBy = null)
         {
             var query = GetUsers(owinContext).Where(condition);
+            var orderedQuery = orderBy == null ? query.OrderBy(u => u.UserName)
+                : orderBy.Compile()(query);
             if (pager == null)
-                return query;
-            return GetUsersPage(query, pager);            
+                return orderedQuery;
+            return GetUsersPage(orderedQuery, pager);            
         }
 
         public bool SignIn(IOwinContext owinContext, LoginViewModel loginModel)
