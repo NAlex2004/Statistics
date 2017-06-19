@@ -22,3 +22,39 @@ select,
 textarea {
     max-width: 280px;
 }
+
+a.pager
+{
+    display: inline-block;
+    /*background-color: #3d5c5c;
+    color: White;*/
+    color: #993300;
+    padding: 3px;
+    margin-left: 4px;
+    border: none;
+}
+
+a.pager:hover
+{
+    background-color: #f8cba5;
+    color: black;
+}
+
+a.pager:visited
+{
+    color: #dc8357;
+}
+
+a.pager:active
+{
+    background-color: #edc8bc;
+}
+
+a.selected-page
+{
+    display: inline-block;
+    /*background-color: #39ac73;
+    color: White;*/
+    padding: 3px;   
+    margin-left: 4px; 
+}

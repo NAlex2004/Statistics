@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Statistics.Identity
+
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -22,8 +24,20 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("О программе", "About", "Home")</li>
-                    <li>@Html.ActionLink("Logout", "Contact", "Home")</li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        @if (AccountManager.IsAdmin(Request.GetOwinContext(), User.Identity.Name))
+                        {
+                            <li>@Html.ActionLink("Users", "Users", "Account"))</li>
+                        }                        
+                    }                    
                 </ul>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <div class="nav right">
+                        @Html.ActionLink(string.Format("Logout ({0})", User.Identity.Name), "Contact", "Home")
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -37,6 +51,7 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/unobtrusive")
     @RenderSection("scripts", required: false)
 </body>
 </html>

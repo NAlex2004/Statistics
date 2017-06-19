@@ -13,6 +13,14 @@ namespace Statistics.Identity
     {
         public AppUserManager(IUserStore<AppUser> store) : base(store)
         {
+            PasswordValidator = new PasswordValidator()
+            {
+                RequireDigit = false,
+                RequiredLength = 4,
+                RequireLowercase = false,
+                RequireNonLetterOrDigit = false,
+                RequireUppercase = false
+            };
         }
 
         public static AppUserManager Create(IdentityFactoryOptions<AppUserManager> options, IOwinContext context)

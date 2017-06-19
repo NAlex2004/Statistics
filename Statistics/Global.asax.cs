@@ -19,7 +19,7 @@ namespace Statistics
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
-
+            
             ItemsPerPage = int.Parse(ConfigurationManager.AppSettings["itemsPerPage"]);
         }
     }

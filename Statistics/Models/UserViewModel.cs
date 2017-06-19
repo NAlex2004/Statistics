@@ -23,6 +23,6 @@ namespace Statistics.Models
         [DataType(DataType.Password)]
         [Compare(otherProperty: "Password", ErrorMessage = "Passwords are not equal")]
         public string PasswordConfirm { get; set; }
-        public IEnumerable<KeyValuePair<string, bool>> Roles { get; set; }
+        public IEnumerable<string> Roles { get; set; }
     }
 }

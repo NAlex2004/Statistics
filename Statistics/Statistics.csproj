@@ -172,12 +172,22 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\HtmlHelpers.cs" />
     <Compile Include="Identity\AccountManager.cs" />
     <Compile Include="Identity\AppDbContext.cs" />
     <Compile Include="Identity\AppRole.cs" />
     <Compile Include="Identity\AppRoleManager.cs" />
     <Compile Include="Identity\AppUser.cs" />
     <Compile Include="Identity\AppUserManager.cs" />
+    <Compile Include="Migrations\201706141655418_InitialCreate.cs" />
+    <Compile Include="Migrations\201706141655418_InitialCreate.Designer.cs">
+      <DependentUpon>201706141655418_InitialCreate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201706190605158_AppUser LastName.cs" />
+    <Compile Include="Migrations\201706190605158_AppUser LastName.Designer.cs">
+      <DependentUpon>201706190605158_AppUser LastName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ChangePasswordViewModel.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Models\ModelsValidator.cs" />
@@ -203,6 +213,8 @@
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
+    <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
@@ -229,7 +241,14 @@
     <Content Include="Views\Account\OneUser.cshtml" />
     <Content Include="Views\Account\Users.cshtml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201706141655418_InitialCreate.resx">
+      <DependentUpon>201706141655418_InitialCreate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201706190605158_AppUser LastName.resx">
+      <DependentUpon>201706190605158_AppUser LastName.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />

@@ -11,31 +11,32 @@ using System.Web;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Linq.Expressions;
+using System.Data.Entity;
 
 namespace Statistics.Identity
-{
+{    
     public class AccountManager
     {
-        public IQueryable<UserViewModel> GetUsers(IOwinContext owinContext)
+        protected IQueryable<UserViewModel> GetUsers(IOwinContext owinContext)
         {
             AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
             AppRoleManager roleManager = owinContext.GetUserManager<AppRoleManager>();
 
-            var users = userManager.Users.Select(u => new UserViewModel()
-            {
-                Id = u.Id,
-                UserName = u.UserName,
-                LastName = u.LastName,
-                Email = u.Email,
-                Roles = u.Roles.SelectMany(ur => roleManager.Roles.Where(r => r.Id.Equals(ur.RoleId))//.DefaultIfEmpty(),
-                    .Select(r => new KeyValuePair<string, bool>(r.Name, true)).AsEnumerable())
-                   // (ur, r) => new KeyValuePair<string, bool>(r.Name, true))
-            });
-            
-            return users;            
+            var users = userManager.Users
+                .Select(u => new UserViewModel()
+                {
+                    Id = u.Id,
+                    UserName = u.UserName,
+                    LastName = u.LastName,
+                    Email = u.Email,
+                    Roles = u.Roles.Select(r => r.RoleId).Join(roleManager.Roles.Select(r => new { r.Id, r.Name })
+                    , rId => rId, rr => rr.Id, (rId, rr) => rr.Name)
+                });
+
+            return users;
         }
 
-        public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, PagerData pager)
+        public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, PagerData pager = null)
         {
             if (pager == null)
                 return GetUsers(owinContext);
@@ -45,12 +46,14 @@ namespace Statistics.Identity
 
         protected IEnumerable<UserViewModel> GetUsersPage(IQueryable<UserViewModel> query, PagerData pager)
         {
-            int total = query.Count();
+            int skip = pager.ItemsPerPage * (pager.CurrentPage - 1);
+            var page = query.OrderBy(x => x.UserName).Skip(skip).Take(pager.ItemsPerPage);
+
+            int total = page.Count();
             int rest = total % pager.ItemsPerPage;
             pager.TotalPages = total / pager.ItemsPerPage + (rest > 0 ? 1 : 0);
-            int skip = pager.ItemsPerPage * (pager.CurrentPage - 1);
 
-            return query.Skip(skip).Take(pager.ItemsPerPage);
+            return page;
         }
 
         public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, Expression<Func<UserViewModel, bool>> condition, PagerData pager = null)
@@ -119,9 +122,9 @@ namespace Statistics.Identity
 
             if (res.Succeeded)
             {                
-                foreach (var roleEntry in userModel.Roles.Where(r => r.Value))
+                foreach (var roleEntry in userModel.Roles)
                 {
-                    res = userManager.AddToRole(user.Id, roleEntry.Key);
+                    res = userManager.AddToRole(user.Id, roleEntry);
                     if (!res.Succeeded)
                         break;
                 }
@@ -141,10 +144,9 @@ namespace Statistics.Identity
                 user.LastName = userModel.LastName;
                 user.Email = userModel.Email;
 
-                var existingRoles = userManager.GetRoles(user.Id);
-                var newRoles = userModel.Roles.Where(r => r.Value).Select(r => r.Key);
-                var rolesToRemove = existingRoles.Except(newRoles);
-                var rolesToAdd = newRoles.Except(existingRoles);
+                var existingRoles = userManager.GetRoles(user.Id);                
+                var rolesToRemove = existingRoles.Except(userModel.Roles);
+                var rolesToAdd = userModel.Roles.Except(existingRoles);
 
                 var tran = context.Database.BeginTransaction();
                 
@@ -196,7 +198,7 @@ namespace Statistics.Identity
             return userManager.Delete(user);
         }
 
-        public bool IsAdmin(IOwinContext owinContext, string userName)
+        public static bool IsAdmin(IOwinContext owinContext, string userName)
         {
             if (string.IsNullOrEmpty(userName))
                 return false;

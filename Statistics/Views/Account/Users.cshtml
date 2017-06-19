@@ -10,10 +10,16 @@
     @Html.ActionLink("Create user", "CreateUser")
 </div>
 
-@foreach (var user in Model.Users)
-{
-    <div class="form-horizontal">
-        Html.RenderPartial("OneUser", user)
-    </div>
-}
+<div id="users">
+    @foreach (var user in Model.Users)
+    {
+        <div class="form-horizontal">
+            @Html.Partial("OneUser", user)
+        </div>
+    }
+</div>
 
+<div class="pager">
+     @Ajax.Pager(Model.Pager, "users", x => Url.Action("Users", new { controller = "Account", page = x }),
+        x => Url.Action("Users", new { controller = "Account", page = x }))
+</div>

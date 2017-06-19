@@ -84,7 +84,7 @@ namespace Statistics.Controllers
 
             if (!ModelState.IsValid || !ModelsValidator.IsValid(model)
                 ||
-                ( !currentUserName.Equals(model.UserName) && !_accountManager.IsAdmin(HttpContext.GetOwinContext(), currentUserName) ))
+                ( !currentUserName.Equals(model.UserName) && !AccountManager.IsAdmin(HttpContext.GetOwinContext(), currentUserName) ))
             {
                 model.Password = model.OldPassword = model.PasswordConfirm = "";                
                 return View(model);
@@ -106,13 +106,13 @@ namespace Statistics.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [Authorize(Roles = "administrator")]
+        [Authorize(Roles = "administrators")]
         public ActionResult EditUser(string id)
         {
             return View();
         }
 
-        [Authorize(Roles = "administrator")]
+        [Authorize(Roles = "administrators")]
         public ActionResult Users(int? page = null)
         {
             PagerData pager = new PagerData()
@@ -130,13 +130,13 @@ namespace Statistics.Controllers
             return View(users);
         }
 
-        [Authorize(Roles = "administrator")]
+        [Authorize(Roles = "administrators")]
         public PartialViewResult OneUser(UserViewModel model)
         {
             return PartialView(model);
         }
 
-        [Authorize(Roles = "administrator")]
+        [Authorize(Roles = "administrators")]
         public ActionResult CreateUser()
         {
             return View();

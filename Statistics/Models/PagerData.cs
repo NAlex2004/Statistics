@@ -7,7 +7,7 @@ namespace Statistics.Models
 {
     public class PagerData
     {
-        int _totalPages = 1;
+        int _totalPages = int.MaxValue;
         int _currentPage = 1;
         int _itemsPerPage = int.MaxValue;
 
