@@ -214,7 +214,8 @@ namespace Statistics.Identity
 
         public IEnumerable<string> GetRoles(IOwinContext owinContext)
         {
-
+            AppRoleManager roleManager = owinContext.GetUserManager<AppRoleManager>();
+            return roleManager.Roles.Select(r => r.Name).ToArray();
         }
     }
 }

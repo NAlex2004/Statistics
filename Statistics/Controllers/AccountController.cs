@@ -223,13 +223,16 @@ namespace Statistics.Controllers
             RolesViewModel model = new RolesViewModel()
             {
                 UserId = id,
-                Roles = new Dictionary<string, bool>()
+                UserName = user.UserName,
+                Roles = new SortedDictionary<string, bool>()
             };
-
+            
             foreach (var role in user.Roles)
                 model.Roles.Add(role, true);
 
-            _accountManager.GetRoles(HttpContext.GetOwinContext());
+            var roles = _accountManager.GetRoles(HttpContext.GetOwinContext());
+            foreach (var role in roles)
+                model.Roles.Add(role, false);
 
             return View(model);
         }
@@ -238,7 +241,30 @@ namespace Statistics.Controllers
         [Authorize(Roles = "administrator")]
         public ActionResult UserRoles(RolesViewModel model)
         {
-            return null;
+            if (model != null)
+            {
+                var context = HttpContext.GetOwinContext();
+                var user = _accountManager.GetUsers(context, u => u.Id.Equals(model.UserId)).FirstOrDefault();
+                if (user != null)
+                {
+                    user.Roles = model.Roles.Where(r => r.Value).Select(r => r.Key).ToArray();
+                    var res = _accountManager.UpdateUser(context, user);
+
+                    if (!res.Succeeded)
+                    {
+                        ErrorViewModel errModel = new ErrorViewModel()
+                        {
+                            Errors = new List<string>(),
+                            ReturnUrl = Url.Action("Users")
+                        };
+                        foreach (var error in res.Errors)
+                            errModel.Errors.Add(error);
+                        return View("ErrorView", errModel);
+                    }
+                }
+            }
+
+            return RedirectToAction("Users");
         }
     }
 }

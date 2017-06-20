@@ -1,0 +1,31 @@
+﻿@model Statistics.Models.RolesViewModel
+
+@{
+    ViewBag.Title = "User Roles";
+}
+
+<h2>Roles for @Model.UserName</h2>
+
+<div class="form-horizontal">
+    @using (Html.BeginForm())
+    {
+        foreach (var role in Model.Roles.Keys)
+        {
+            <div class="form-group">
+                <label class="control-label col-md-2">@role</label>
+                <div class="col-md-10">
+                    @Html.CheckBoxFor(m => m.Roles[role], new { @class = "checkbox" })
+                </div>
+            </div>
+        }
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <button id="bSave" type="submit" name="submit" value="Save" class="btn btn-default">Save</button>
+                <button id="bCancel" type="submit" name="submit" value="Cancel" class="btn">Cancel</button>
+                <button type="reset" class="btn">Reset</button>
+            </div>
+        </div>
+    }
+</div>
+
