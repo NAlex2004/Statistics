@@ -192,6 +192,7 @@
     <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Models\ModelsValidator.cs" />
     <Compile Include="Models\PagerData.cs" />
+    <Compile Include="Models\RolesViewModel.cs" />
     <Compile Include="Models\UsersListViewModel.cs" />
     <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -239,6 +240,8 @@
     <Content Include="Views\Account\OneUser.cshtml" />
     <Content Include="Views\Account\Users.cshtml" />
     <Content Include="Views\Account\UsersData.cshtml" />
+    <Content Include="Views\Account\EditUser.cshtml" />
+    <Content Include="Views\Account\EditUserData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201706141655418_InitialCreate.resx">

@@ -1,9 +1,19 @@
 ﻿@model Statistics.Models.UserViewModel
 
-<div>
+@{
+    AjaxOptions editOptions = new AjaxOptions()
+    {
+        Url = Url.Action(string.Format("EditUserData/{0}", Model.Id)),
+        HttpMethod = "GET",
+        UpdateTargetId = Model.Id
+    };
+
+}
+<div id="@Model.Id">
     <hr />
+    @Html.HiddenFor(x => x.Id)
     <dl class="dl-horizontal">
-        <dt> 
+        <dt>
             @Html.DisplayNameFor(model => model.UserName)
         </dt>
 
@@ -25,11 +35,13 @@
 
         <dd>
             @Html.DisplayFor(model => model.Email)
-        </dd>       
+        </dd>
 
     </dl>
+
+    <p>
+        @Ajax.ActionLink("Edit", "EditUser", new { id = Model.Id }, editOptions) |
+        @Html.ActionLink("Delete", "DeleteUser", new { id = Model.Id })
+    </p>
 </div>
-<p>
-    @Html.ActionLink("Edit", "EditUser", new {  id = Model.Id }) |
-    @Html.ActionLink("Delete", "DeleteUser", new { id = Model.Id })
-</p>
+

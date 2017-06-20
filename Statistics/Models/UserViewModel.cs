@@ -22,7 +22,16 @@ namespace Statistics.Models
         [Required]
         [DataType(DataType.Password)]
         [Compare(otherProperty: "Password", ErrorMessage = "Passwords are not equal")]
+        [Display(Name = "Password confirmation")]
         public string PasswordConfirm { get; set; }
         public IEnumerable<string> Roles { get; set; }
+
+        public string submit { get; set; }
+
+        public UserViewModel()
+        {
+            submit = "Cancel";
+            Roles = new List<string>();
+        }
     }
 }

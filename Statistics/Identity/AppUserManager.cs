@@ -6,6 +6,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
+using Microsoft.Owin.Security.DataProtection;
 
 namespace Statistics.Identity
 {
@@ -13,6 +14,9 @@ namespace Statistics.Identity
     {
         public AppUserManager(IUserStore<AppUser> store) : base(store)
         {
+            var provider = new DpapiDataProtectionProvider("SalesStatistics");
+            UserTokenProvider = new DataProtectorTokenProvider<AppUser>(provider.Create("Passwords"));
+
             PasswordValidator = new PasswordValidator()
             {
                 RequireDigit = false,

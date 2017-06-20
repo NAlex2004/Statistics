@@ -25,12 +25,13 @@
                 <ul class="nav navbar-nav">                    
                     @if (User.Identity.IsAuthenticated)
                     {
+                        <li>@Html.ActionLink("Change password", "ChangePassword", "Account", new { returnUrl = Request.Url.AbsoluteUri }, null)</li>
                         if (AccountManager.IsAdmin(Request.GetOwinContext(), User.Identity.Name))
                         {
                             <li>@Html.ActionLink("Users", "Users", "Account"))</li>
                         }
                         
-                        <li class="right">@Html.ActionLink(string.Format("Logout ({0})", User.Identity.Name), "Logout", "Account")</li>
+                        <li>@Html.ActionLink(string.Format("Logout ({0})", User.Identity.Name), "Logout", "Account")</li>
                     }                    
                 </ul>                
             </div>
@@ -45,6 +46,7 @@
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/unobtrusive")
+    @Scripts.Render("~/bundles/jqueryval")
     @RenderSection("scripts", required: false)
 </body>
 </html>

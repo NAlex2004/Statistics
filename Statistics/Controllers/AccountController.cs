@@ -109,24 +109,63 @@ namespace Statistics.Controllers
         [Authorize(Roles = "administrators")]
         public ActionResult EditUser(string id)
         {
-            return View();
+            return View(id);
+        }
+
+        [Authorize(Roles = "administrators")]
+        public ActionResult EditUserData(string id)
+        {
+            var user = _accountManager.GetUsers(HttpContext.GetOwinContext(), u => u.Id.Equals(id)).FirstOrDefault();
+            if (user == null)
+                return null;
+            return PartialView(user);
+        }
+
+        protected ActionResult ReturnFromEditUser(UserViewModel model, bool success)
+        {
+            model.Password = model.PasswordConfirm = "";
+
+            if (success)
+            {                
+                if (Request.IsAjaxRequest())
+                    return PartialView("OneUser", model);
+                else
+                    return View("Users");
+            }
+            
+            if (Request.IsAjaxRequest())
+                return PartialView("EditUserData", model);
+            return View("EditUser", model.Id);            
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "administrators")]        
+        public ActionResult EditUserData(UserViewModel model)
+        {
+            if (model.submit == "Cancel")
+                return ReturnFromEditUser(model, true);
+
+            if (ModelState.IsValid)
+            {
+                var updResult = _accountManager.UpdateUser(HttpContext.GetOwinContext(), model);
+
+                if (!updResult.Succeeded)
+                {
+                    foreach (var err in updResult.Errors)
+                        ModelState.AddModelError("", err);
+
+                    return ReturnFromEditUser(model, false);
+                }
+
+                return ReturnFromEditUser(model, true);
+            }
+
+            return ReturnFromEditUser(model, false);
         }
 
         [Authorize(Roles = "administrators")]
         public ActionResult Users(int? page = null)
-        {
-            //PagerData pager = new PagerData()
-            //{
-            //    ItemsPerPage = MvcApplication.ItemsPerPage,
-            //    CurrentPage = page ?? 1
-            //};
-
-            //UsersListViewModel users = new UsersListViewModel()
-            //{
-            //    Pager = pager,
-            //    Users = _accountManager.GetUsers(HttpContext.GetOwinContext(), pager)
-            //};
-            
+        {            
             return View(page);
         }
 
@@ -154,6 +193,15 @@ namespace Statistics.Controllers
             return PartialView(model);
         }
 
+        [Authorize(Roles = "administrators")]        
+        public PartialViewResult OneUserById(string id)
+        {
+            var user = _accountManager.GetUsers(HttpContext.GetOwinContext(), u => u.Id.Equals(id)).FirstOrDefault();
+            if (user == null)
+                return null;
+            return PartialView("OneUser", user);
+        }
+
         [Authorize(Roles = "administrators")]
         public ActionResult CreateUser()
         {
@@ -164,6 +212,33 @@ namespace Statistics.Controllers
         public ActionResult DeleteUser(string id)
         {
             return View();
+        }
+
+        [Authorize(Roles = "administrator")]
+        public ActionResult UserRoles(string id)
+        {
+            var user = _accountManager.GetUsers(HttpContext.GetOwinContext(), u => u.Id.Equals(id)).FirstOrDefault();
+            if (user == null)
+                return null;
+            RolesViewModel model = new RolesViewModel()
+            {
+                UserId = id,
+                Roles = new Dictionary<string, bool>()
+            };
+
+            foreach (var role in user.Roles)
+                model.Roles.Add(role, true);
+
+            _accountManager.GetRoles(HttpContext.GetOwinContext());
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "administrator")]
+        public ActionResult UserRoles(RolesViewModel model)
+        {
+            return null;
         }
     }
 }

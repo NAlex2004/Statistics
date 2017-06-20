@@ -22,10 +22,6 @@ namespace Statistics.Helpers
                 if (i == data.CurrentPage)
                     li.AddCssClass("active");
                 TagBuilder a = new TagBuilder("a");
-                //if (i != data.CurrentPage)
-                //    a.AddCssClass("pager");
-                //else
-                //    a.AddCssClass("selected-page");
                 a.MergeAttribute("href", PageURLFunc(i));
                 a.InnerHtml = i.ToString();
                 li.InnerHtml += a.ToString();
@@ -48,10 +44,6 @@ namespace Statistics.Helpers
                 if (i == data.CurrentPage)
                     li.AddCssClass("active");
                 TagBuilder a = new TagBuilder("a");
-                //if (i != data.CurrentPage)
-                //    a.AddCssClass("pager");
-                //else
-                //    a.AddCssClass("selected-page");
                 a.MergeAttribute("data-ajax", "true");
                 a.MergeAttribute("data-ajax- mode", "replace");
                 a.MergeAttribute("data-ajax-update", "#" + UpdateTargetID);

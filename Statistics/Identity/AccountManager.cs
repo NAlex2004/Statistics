@@ -211,5 +211,10 @@ namespace Statistics.Identity
             var user = userManager.FindByName(userName);
             return userManager.IsInRole(user.Id, "administrators");
         }
+
+        public IEnumerable<string> GetRoles(IOwinContext owinContext)
+        {
+
+        }
     }
 }
