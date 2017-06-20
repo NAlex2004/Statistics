@@ -138,56 +138,68 @@ namespace Statistics.Identity
             return res;
         }
 
+        public IdentityResult UpdateUserRoles(IOwinContext owinContext, RolesViewModel model)
+        {
+            if (model == null)
+                return new IdentityResult("Roles not found.");
+
+            AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
+            AppUser user = userManager.FindById(model.UserId);
+
+            var checkedRoles = model.Roles.Where(r => r.Value).Select(r => r.Key);
+            var existingRoles = userManager.GetRoles(user.Id);
+            var rolesToRemove = existingRoles.Except(checkedRoles);
+            var rolesToAdd = checkedRoles.Except(existingRoles);
+
+            IdentityResult result = IdentityResult.Success;
+
+            var context = owinContext.Get<AppDbContext>();
+            using (var tran = context.Database.BeginTransaction())
+            {
+                foreach (var role in rolesToRemove)
+                {
+                    result = userManager.RemoveFromRole(user.Id, role);
+                    if (!result.Succeeded)
+                        break;
+                }
+
+                if (result.Succeeded)
+                {
+                    foreach (var role in rolesToAdd)
+                    {
+                        result = userManager.AddToRole(user.Id, role);
+                        if (!result.Succeeded)
+                            break;
+                    }
+                }
+
+                if (result.Succeeded)
+                    tran.Commit();
+                else
+                    tran.Rollback();
+            }
+
+            return result;
+        }
+
         public IdentityResult UpdateUser(IOwinContext owinContext, UserViewModel userModel)
         {
             AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
-            AppUser user = userManager.FindByName(userModel.UserName);
-            var context = owinContext.Get<AppDbContext>();
+            AppUser user = userManager.FindByName(userModel.UserName);            
             
             if (user != null)
             {
                 user.LastName = userModel.LastName;
                 user.Email = userModel.Email;
-
-                var existingRoles = userManager.GetRoles(user.Id);                
-                var rolesToRemove = existingRoles.Except(userModel.Roles);
-                var rolesToAdd = userModel.Roles.Except(existingRoles);
-
-                var tran = context.Database.BeginTransaction();
-                
+               
                 IdentityResult result = userManager.Update(user);
 
                 // !!! ??? 
 
                 if (result.Succeeded)
                 {
-                    result = userManager.ResetPassword(user.Id, userManager.GeneratePasswordResetToken(user.Id), userModel.Password);
-
-                    if (result.Succeeded)
-                    {
-                        foreach (var role in rolesToRemove)
-                        {
-                            result = userManager.RemoveFromRole(user.Id, role);
-                            if (!result.Succeeded)
-                                break;
-                        }
-
-                        if (result.Succeeded)
-                        {
-                            foreach (var role in rolesToAdd)
-                            {
-                                result = userManager.AddToRole(user.Id, role);
-                                if (!result.Succeeded)
-                                    break;
-                            }
-                        }
-
-                        if (result.Succeeded)
-                            tran.Commit();
-                        else
-                            tran.Rollback();
-                        
-                    }
+                    if (!string.IsNullOrEmpty(userModel.Password))
+                        result = userManager.ResetPassword(user.Id, userManager.GeneratePasswordResetToken(user.Id), userModel.Password);
                 }
 
                 return result;

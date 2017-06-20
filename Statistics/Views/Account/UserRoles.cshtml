@@ -9,6 +9,8 @@
 <div class="form-horizontal">
     @using (Html.BeginForm())
     {
+        @Html.HiddenFor(m => m.UserId)
+        @Html.HiddenFor(m => m.UserName)
         foreach (var role in Model.Roles.Keys)
         {
             <div class="form-group">

@@ -208,13 +208,13 @@ namespace Statistics.Controllers
             return View();
         }
 
-        [Authorize(Roles = "administrator")]
+        [Authorize(Roles = "administrators")]
         public ActionResult DeleteUser(string id)
         {
             return View();
         }
 
-        [Authorize(Roles = "administrator")]
+        [Authorize(Roles = "administrators")]
         public ActionResult UserRoles(string id)
         {
             var user = _accountManager.GetUsers(HttpContext.GetOwinContext(), u => u.Id.Equals(id)).FirstOrDefault();
@@ -230,7 +230,7 @@ namespace Statistics.Controllers
             foreach (var role in user.Roles)
                 model.Roles.Add(role, true);
 
-            var roles = _accountManager.GetRoles(HttpContext.GetOwinContext());
+            var roles = _accountManager.GetRoles(HttpContext.GetOwinContext()).Except(model.Roles.Keys);
             foreach (var role in roles)
                 model.Roles.Add(role, false);
 
@@ -238,29 +238,23 @@ namespace Statistics.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "administrator")]
+        [Authorize(Roles = "administrators")]
         public ActionResult UserRoles(RolesViewModel model)
         {
-            if (model != null)
+            if (model != null && model.submit == "Save")
             {
-                var context = HttpContext.GetOwinContext();
-                var user = _accountManager.GetUsers(context, u => u.Id.Equals(model.UserId)).FirstOrDefault();
-                if (user != null)
-                {
-                    user.Roles = model.Roles.Where(r => r.Value).Select(r => r.Key).ToArray();
-                    var res = _accountManager.UpdateUser(context, user);
+                var res = _accountManager.UpdateUserRoles(HttpContext.GetOwinContext(), model);
 
-                    if (!res.Succeeded)
+                if (!res.Succeeded)
+                {
+                    ErrorViewModel errModel = new ErrorViewModel()
                     {
-                        ErrorViewModel errModel = new ErrorViewModel()
-                        {
-                            Errors = new List<string>(),
-                            ReturnUrl = Url.Action("Users")
-                        };
-                        foreach (var error in res.Errors)
-                            errModel.Errors.Add(error);
-                        return View("ErrorView", errModel);
-                    }
+                        Errors = new List<string>(),
+                        ReturnUrl = Url.Action("Users")
+                    };
+                    foreach (var error in res.Errors)
+                        errModel.Errors.Add(error);
+                    return View("ErrorView", errModel);
                 }
             }
 
