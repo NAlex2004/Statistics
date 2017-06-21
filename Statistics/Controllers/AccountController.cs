@@ -237,9 +237,7 @@ namespace Statistics.Controllers
                 return View(model);
             }
 
-            RolesViewModel rolesModel = CreateRolesModel(model);
-
-            return RedirectToAction("UserRoles");
+            return UserRoles(model.Id);
         }
 
         [Authorize(Roles = "administrators")]
@@ -251,25 +249,28 @@ namespace Statistics.Controllers
             var context = HttpContext.GetOwinContext();
             var user = _accountManager.GetUsers(context, u => u.Id.Equals(id)).FirstOrDefault();
             if (user == null)
+                return RedirectToAction("Users");            
+
+            return View(user);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "administrators")]
+        public ActionResult DeleteUser(UserViewModel model)
+        {
+            var result = _accountManager.DeleteUser(HttpContext.GetOwinContext(), model.Id);
+            if (result.Succeeded)
                 return RedirectToAction("Users");
-            if (Request.RequestType == "POST")
+
+            ErrorViewModel errorModel = new ErrorViewModel()
             {
-                var result = _accountManager.DeleteUser(context, id);
-                if (result.Succeeded)
-                    return RedirectToAction("Users");
+                ReturnUrl = Url.Action("Users"),
+                Errors = new List<string>()
+            };
+            foreach (var error in result.Errors)
+                errorModel.Errors.Add(error);
 
-                ErrorViewModel errorModel = new ErrorViewModel()
-                {
-                    ReturnUrl = Url.Action("Users"),
-                    Errors = new List<string>()
-                };
-                foreach (var error in result.Errors)
-                    errorModel.Errors.Add(error);
-
-                return View("ErrorView"); 
-            }
-
-            return View(id);
+            return View("ErrorView");
         }
 
         protected RolesViewModel CreateRolesModel(UserViewModel userModel)

@@ -123,6 +123,7 @@ namespace Statistics.Identity
                 Email = userModel.Email
             };
 
+
             IdentityResult res = userManager.Create(user, userModel.Password);
 
             if (res.Succeeded)

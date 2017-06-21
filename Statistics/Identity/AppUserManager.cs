@@ -25,6 +25,8 @@ namespace Statistics.Identity
                 RequireNonLetterOrDigit = false,
                 RequireUppercase = false
             };
+
+            UserValidator = new AppUserValidator(this);
         }
 
         public static AppUserManager Create(IdentityFactoryOptions<AppUserManager> options, IOwinContext context)
