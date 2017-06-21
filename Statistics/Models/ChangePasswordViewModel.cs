@@ -11,6 +11,7 @@ namespace Statistics.Models
         [Required]
         public string UserName { get; set; }
         [Required]
+        [Display(Name = "Old password")]
         [DataType(DataType.Password)]
         public string OldPassword { get; set; }
         [Required]
@@ -18,6 +19,7 @@ namespace Statistics.Models
         public string Password { get; set; }
         [Required]
         [DataType(DataType.Password)]
+        [Display(Name = "Password confirmation")]
         [Compare(otherProperty: "Password", ErrorMessage = "Passwords are not equal.")]
         public string PasswordConfirm { get; set; }
         

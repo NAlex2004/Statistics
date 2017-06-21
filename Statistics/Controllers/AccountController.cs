@@ -80,28 +80,31 @@ namespace Statistics.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult ChangePassword(ChangePasswordViewModel model)
         {
-            string currentUserName = User.Identity.Name;
-
-            if (!ModelState.IsValid || !ModelsValidator.IsValid(model)
-                ||
-                ( !currentUserName.Equals(model.UserName) && !AccountManager.IsAdmin(HttpContext.GetOwinContext(), currentUserName) ))
+            if (model != null)
             {
-                model.Password = model.OldPassword = model.PasswordConfirm = "";                
-                return View(model);
-            }
-            
-            IdentityResult res = _accountManager.ChangePassword(HttpContext.GetOwinContext(), model);
+                string currentUserName = User.Identity.Name;
 
-            if (!res.Succeeded)
-            {
-                foreach (var error in res.Errors)
-                    ModelState.AddModelError("", error);
-                model.Password = model.OldPassword = model.PasswordConfirm = "";
-                return View(model);
-            }
+                if (!ModelState.IsValid
+                    ||
+                    (!currentUserName.Equals(model.UserName) && !AccountManager.IsAdmin(HttpContext.GetOwinContext(), currentUserName)))
+                {
+                    model.Password = model.OldPassword = model.PasswordConfirm = "";
+                    return View(model);
+                }
 
-            if (!string.IsNullOrEmpty(model.ReturnUrl))
-                return Redirect(model.ReturnUrl);
+                IdentityResult res = _accountManager.ChangePassword(HttpContext.GetOwinContext(), model);
+
+                if (!res.Succeeded)
+                {
+                    foreach (var error in res.Errors)
+                        ModelState.AddModelError("", error);
+                    model.Password = model.OldPassword = model.PasswordConfirm = "";
+                    return View(model);
+                }
+
+                if (!string.IsNullOrEmpty(model.ReturnUrl))
+                    return Redirect(model.ReturnUrl);
+            }                        
 
             return RedirectToAction("Index", "Home");
         }
@@ -118,6 +121,7 @@ namespace Statistics.Controllers
             var user = _accountManager.GetUsers(HttpContext.GetOwinContext(), u => u.Id.Equals(id)).FirstOrDefault();
             if (user == null)
                 return null;
+            user.EditMode = UserEditMode.Edit;
             return PartialView(user);
         }
 
@@ -205,13 +209,93 @@ namespace Statistics.Controllers
         [Authorize(Roles = "administrators")]
         public ActionResult CreateUser()
         {
-            return View();
+            UserViewModel model = new UserViewModel();
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "administrators")]
+        [ValidateAntiForgeryToken]
+        public ActionResult CreateUser(UserViewModel model)
+        {
+            if (model == null)
+                return RedirectToAction("Users");
+
+            if (!ModelState.IsValid)
+            {
+                model.Password = model.PasswordConfirm = "";
+                return View(model);
+            }
+
+            var result = _accountManager.CreateUser(HttpContext.GetOwinContext(), model);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                    ModelState.AddModelError("", error);
+                model.Password = model.PasswordConfirm = "";
+                return View(model);
+            }
+
+            RolesViewModel rolesModel = CreateRolesModel(model);
+
+            return RedirectToAction("UserRoles");
         }
 
         [Authorize(Roles = "administrators")]
         public ActionResult DeleteUser(string id)
         {
-            return View();
+            if (string.IsNullOrEmpty(id))
+                return RedirectToAction("Users");
+
+            var context = HttpContext.GetOwinContext();
+            var user = _accountManager.GetUsers(context, u => u.Id.Equals(id)).FirstOrDefault();
+            if (user == null)
+                return RedirectToAction("Users");
+            if (Request.RequestType == "POST")
+            {
+                var result = _accountManager.DeleteUser(context, id);
+                if (result.Succeeded)
+                    return RedirectToAction("Users");
+
+                ErrorViewModel errorModel = new ErrorViewModel()
+                {
+                    ReturnUrl = Url.Action("Users"),
+                    Errors = new List<string>()
+                };
+                foreach (var error in result.Errors)
+                    errorModel.Errors.Add(error);
+
+                return View("ErrorView"); 
+            }
+
+            return View(id);
+        }
+
+        protected RolesViewModel CreateRolesModel(UserViewModel userModel)
+        {
+            if (userModel == null)
+                return null;
+
+            RolesViewModel rolesModel = new RolesViewModel()
+            {
+                UserId = userModel.Id,
+                UserName = userModel.UserName,
+                Roles = new SortedDictionary<string, bool>()
+            };
+
+            if (userModel.Roles != null)
+            {
+                foreach (var role in userModel.Roles)
+                    rolesModel.Roles.Add(role, true);
+            }            
+
+            var roles = _accountManager.GetRoles(HttpContext.GetOwinContext()).Except(rolesModel.Roles.Keys);
+
+            foreach (var role in roles)
+                rolesModel.Roles.Add(role, false);
+
+            return rolesModel;
         }
 
         [Authorize(Roles = "administrators")]
@@ -220,19 +304,7 @@ namespace Statistics.Controllers
             var user = _accountManager.GetUsers(HttpContext.GetOwinContext(), u => u.Id.Equals(id)).FirstOrDefault();
             if (user == null)
                 return null;
-            RolesViewModel model = new RolesViewModel()
-            {
-                UserId = id,
-                UserName = user.UserName,
-                Roles = new SortedDictionary<string, bool>()
-            };
-            
-            foreach (var role in user.Roles)
-                model.Roles.Add(role, true);
-
-            var roles = _accountManager.GetRoles(HttpContext.GetOwinContext()).Except(model.Roles.Keys);
-            foreach (var role in roles)
-                model.Roles.Add(role, false);
+            RolesViewModel model = CreateRolesModel(user);
 
             return View(model);
         }

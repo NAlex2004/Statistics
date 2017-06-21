@@ -107,7 +107,7 @@ namespace Statistics.Identity
             AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
             AppUser user = userManager.Find(model.UserName, model.OldPassword);
             if (user == null)
-                return new IdentityResult("User not found");
+                return new IdentityResult("User name or password incorrect.");
             
             IdentityResult res = userManager.ChangePassword(user.Id, model.OldPassword, model.Password);
             return res;
@@ -212,6 +212,13 @@ namespace Statistics.Identity
         {
             AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
             AppUser user = userManager.FindByName(userModel.UserName);
+            return userManager.Delete(user);
+        }
+
+        public IdentityResult DeleteUser(IOwinContext owinContext, string userId)
+        {
+            AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
+            AppUser user = userManager.FindById(userId);
             return userManager.Delete(user);
         }
 
