@@ -23,8 +23,12 @@ namespace NAlex.Selling.DAL.Repositories
 
             _context = context;
 
-            Mapper.CreateMap<TEntity, TDto>();
-            Mapper.CreateMap<TDto, TEntity>();
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<TEntity, TDto>();
+                cfg.CreateMap<TDto, TEntity>();
+            });
+            
         }
 
         public virtual TDto Get(TKey Id)
@@ -34,6 +38,7 @@ namespace NAlex.Selling.DAL.Repositories
 
         public virtual IEnumerable<TDto> GetAll()
         {
+            
             return _context.Set<TEntity>().UseAsDataSource().For<TDto>().ToArray();
         }
 
