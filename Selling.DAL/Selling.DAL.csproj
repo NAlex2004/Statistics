@@ -74,8 +74,8 @@
     <Compile Include="Repositories\SalesRepository.cs" />
     <Compile Include="Repositories\TempSalesRepository.cs" />
     <Compile Include="Result.cs" />
-    <Compile Include="Units\ISalesUnit.cs" />
-    <Compile Include="Units\SalesUnit.cs" />
+    <Compile Include="Units\ISalesUoW.cs" />
+    <Compile Include="Units\SalesUoW.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataModel\DataModel.csproj">

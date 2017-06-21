@@ -237,7 +237,7 @@ namespace Statistics.Controllers
                 return View(model);
             }
 
-            return UserRoles(model.Id);
+            return RedirectToAction("UserRoles", new { id = model.Id });
         }
 
         [Authorize(Roles = "administrators")]

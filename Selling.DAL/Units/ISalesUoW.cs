@@ -8,7 +8,7 @@ using NAlex.Selling.DTO.Classes;
 
 namespace NAlex.Selling.DAL.Units
 {
-    public interface ISalesUnit: IDisposable
+    public interface ISalesUoW: IDisposable
     {
         IRepository<CustomerDTO, int> Customers { get; }
         IRepository<ProductDTO, int> Products { get; }
@@ -17,7 +17,6 @@ namespace NAlex.Selling.DAL.Units
         IRepository<TempSaleDTO, int> TempSales { get; }
 
         SpResult CopyTempSalesToSales(Guid sessionId);
-        void DeleteTempSales(Guid sessionId);
         int SaveChanges();
     }
 }

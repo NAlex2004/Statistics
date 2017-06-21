@@ -18,8 +18,8 @@ namespace Statistics.Identity
         public override async Task<IdentityResult> ValidateAsync(AppUser item)
         {
             IdentityResult result = await base.ValidateAsync(item);
-
-            if (_manager.Users.Where(u => u.LastName.Equals(item.LastName)).Any())
+            var existing = _manager.Users.Where(u => u.LastName.Equals(item.LastName)).FirstOrDefault();
+            if (existing != null && !item.Id.Equals(existing.Id))
             {
                 var errors = result.Errors.ToList();
                 errors.Add(string.Format("User with Last Name '{0}' already exists.", item.LastName));

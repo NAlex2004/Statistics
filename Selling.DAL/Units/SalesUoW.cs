@@ -10,7 +10,7 @@ using NAlex.DataModel.Entities;
 
 namespace NAlex.Selling.DAL.Units
 {
-    public class SalesUnit: ISalesUnit
+    public class SalesUoW: ISalesUoW
     {
         private bool _disposed = false;
         private DbContext _context;
@@ -21,7 +21,7 @@ namespace NAlex.Selling.DAL.Units
         IRepository<SaleDTO, int> _sales;
         IRepository<TempSaleDTO, int> _tempSales;
 
-        public SalesUnit()
+        public SalesUoW()
         {
             _context = new SalesContext();
 
@@ -95,14 +95,5 @@ namespace NAlex.Selling.DAL.Units
             _disposed = true;
         }
 
-        /// <summary>
-        /// Delete from database
-        /// </summary>        
-        public void DeleteTempSales(Guid sessionId)
-        {            
-            SqlParameter sessionParameter = new SqlParameter("@SessionId", System.Data.SqlDbType.UniqueIdentifier);
-            sessionParameter.Value = sessionId;
-            _context.Database.ExecuteSqlCommand("delete from TempSales where SessionId = @SessionId", sessionParameter);
-        }
     }
 }

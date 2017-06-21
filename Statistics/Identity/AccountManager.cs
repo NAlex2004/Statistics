@@ -127,7 +127,9 @@ namespace Statistics.Identity
             IdentityResult res = userManager.Create(user, userModel.Password);
 
             if (res.Succeeded)
-            {                
+            {
+                userModel.Id = user.Id;
+
                 foreach (var roleEntry in userModel.Roles)
                 {
                     res = userManager.AddToRole(user.Id, roleEntry);

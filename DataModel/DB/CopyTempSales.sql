@@ -24,14 +24,14 @@ BEGIN
 	BEGIN TRANSACTION Tr
 
 	-- locks until we finish job..
-	select top 1 @ManagerId = Id
-	from Managers with (tablockx, holdlock)
+	--select top 1 @ManagerId = Id
+	--from Managers with (tablockx, holdlock)
 	
-	select top 1 @ManagerId = Id
-	from Customers with (tablockx, holdlock)
+	--select top 1 @ManagerId = Id
+	--from Customers with (tablockx, holdlock)
 	
-	select top 1 @ManagerId = Id
-	from Products with (tablockx, holdlock)
+	--select top 1 @ManagerId = Id
+	--from Products with (tablockx, holdlock)
 
 	set @ManagerId = 0
 	
