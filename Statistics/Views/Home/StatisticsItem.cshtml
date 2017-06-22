@@ -7,15 +7,6 @@
         UpdateTargetId = string.Format("item_{0}", Model.Id),
         HttpMethod = "GET"
     };
-
-    //AjaxOptions deleteOptions = new AjaxOptions()
-    //{
-    //    Url = Url.Action("DeleteSale", new { id = Model.Id }),
-    //    UpdateTargetId = string.Format("item_{0}", Model.Id),
-    //    HttpMethod = "POST",
-    //    Confirm = "Delete this sale?",
-    //    OnSuccess = ""
-    //};
 }
 <td>
     @Html.DisplayFor(item => item.SaleDate)
@@ -29,7 +20,7 @@
 <td>
     @Html.DisplayFor(item => item.Product)
 </td>
-<td>
+<td id="totalText_@Model.Id">
     @Html.DisplayFor(item => item.Total)
 </td>
 <td>
@@ -37,7 +28,6 @@
     @Ajax.ActionLink("Edit", "EditSale", new { id = Model.Id }, editOptions) |
     @*@Html.ActionLink("Delete", "DeleteSale", new { id = Model.Id }, new { id = string.Format("delLink_{0}", Model.Id), onclick = "return delClick()")*@
     <a href="@Url.Action("DeleteSale", new { id = Model.Id })" id="delLink_@Model.Id" onclick="return delClick(@Model.Id);">Delete</a>
-})
 </td>
 
 

@@ -1,8 +1,20 @@
 ﻿@model IEnumerable<Statistics.Models.SaleViewModel>
-
+@{ 
+    double total = 0;
+}
 @foreach (var item in Model)
 {
+    total += item.Total;
     <tr id="item_@item.Id">
         @Html.Partial("StatisticsItem", item)
     </tr>
 }
+<tr>
+    <td></td>
+    <td></td>
+    <td></td>
+    <td style="text-align:right; font-weight: bold">Total:</td>
+    <td id="total" style="font-weight:bold">
+        @total
+    </td>
+</tr>

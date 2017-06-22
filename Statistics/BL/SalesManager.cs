@@ -92,8 +92,9 @@ namespace Statistics.BL
                         _unitOfWork.SaveChanges();
                         return true;
                     }   
-                    catch
+                    catch (Exception e)
                     {
+
                     }                        
                 }                
             }

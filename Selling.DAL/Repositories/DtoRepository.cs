@@ -69,7 +69,11 @@ namespace NAlex.Selling.DAL.Repositories
             TEntity local = _context.Set<TEntity>().Local.FirstOrDefault(e => Mapper.Map<TDto>(e).Equals(entity));
             if (local != null)
             {
-                _context.Entry<TEntity>(local).State = EntityState.Detached;
+                if (_context.Entry<TEntity>(local).State == EntityState.Added)
+                    _context.Entry<TEntity>(local).State = EntityState.Detached;
+                else
+                    _context.Set<TEntity>().Remove(local);
+
                 return;
             }
 

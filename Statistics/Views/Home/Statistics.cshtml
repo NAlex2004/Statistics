@@ -38,18 +38,26 @@
 <script type="text/javascript">
     function delClick(id) {
         var element = $("#item_".concat(id));
-
+        
         if (confirm("Delete this sale?")) {
             $.ajax({
-                type: "POST",
-                data: { "id": id },
-                url: "DeleteSale",
-            }).done(function (data) {
-                if (data.result)
-                    element.empty;
+                type: "GET",           
+                url: "/Home/DeleteSale/".concat(id),
+                complete: function (jqXHR, status) {
+                    if (status == 'success' || status == 'notmodified') {
+                        var result = $.parseJSON(jqXHR.responseText);                        
+                        if (result == "true") {
+                            var sum = parseFloat($("#totalText_".concat(id)).text().replace(",", ".").replace(/\s+/g, ''));
+                            var total = parseFloat($("#total").text().replace(',', '.'));                            
+                            total = total - sum;
+                            $("#total").text(total.toFixed(2));
+                            element.empty();                            
+                        }
+                    }
+                }
             });
         };
-        element.empty();
+        
         return false;
     }
 

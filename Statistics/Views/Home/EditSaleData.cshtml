@@ -1,27 +1,77 @@
 ﻿@model Statistics.Models.SaleViewModel
 
-<td>
-    @Html.EditorFor(model => model.SaleDate, new { htmlAttributes = new { @class = "form-control datefield" } })
-    @Html.ValidationMessageFor(model => model.SaleDate, "", new { @class = "text-danger" })
-</td>
-<td>
-    @Html.EditorFor(model => model.Manager, new { htmlAttributes = new { @class = "form-control" } })
-    @Html.ValidationMessageFor(model => model.Manager, "", new { @class = "text-danger" })
-</td>
-<td>
-    @Html.EditorFor(model => model.Customer, new { htmlAttributes = new { @class = "form-control" } })
-    @Html.ValidationMessageFor(model => model.Customer, "", new { @class = "text-danger" })
-</td>
-<td>
-    @Html.EditorFor(model => model.Product, new { htmlAttributes = new { @class = "form-control" } })
-    @Html.ValidationMessageFor(model => model.Product, "", new { @class = "text-danger" })
-</td>
-<td>
-    @Html.EditorFor(model => model.Total, new { htmlAttributes = new { @class = "form-control" } })
-    @Html.ValidationMessageFor(model => model.Total, "", new { @class = "text-danger" })
-</td>
-<td>
-    @Html.ActionLink("Edit", "EditSale", new { id = Model.Id }) |
-    @Html.ActionLink("Delete", "DeleteSale", new { id = Model.Id })
+@{AjaxOptions opt = new AjaxOptions()
+    {
+        Url = Url.Action("EditSale"),
+        HttpMethod = "POST",
+        UpdateTargetId = string.Format("item_{0}", Model.Id)        
+    };
+}
+<td colspan="6">
+   @using (Ajax.BeginForm(opt))
+   {
+    <table class="table-bordered">
+        <tr>
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        </tr>
+        <tr>
+            <td>
+                @Html.EditorFor(model => model.SaleDate, new { htmlAttributes = new { @class = "form-control datefield" } })
+                @Html.ValidationMessageFor(model => model.SaleDate, "", new { @class = "text-danger" })
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Manager, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Manager, "", new { @class = "text-danger" })
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Customer, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Customer, "", new { @class = "text-danger" })
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Product, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Product, "", new { @class = "text-danger" })
+            </td>
+            <td>
+                @Html.EditorFor(model => model.Total, new { htmlAttributes = new { @class = "form-control", id=string.Format("total_{0}", Model.Id) } })
+                @Html.ValidationMessageFor(model => model.Total, "", new { @class = "text-danger" })
+            </td>
+            <td>
+                @Html.HiddenFor(model => model.Id)
+                <button id="bSave_@Model.Id" type="submit" name="submit" value="Save" class="btn btn-default">Save</button>
+                <button id="bCancel_@Model.Id" type="submit" name="submit" value="Cancel" class="btn btn-default">Cancel</button>
+            </td>
+        </tr>
+    </table>
+   }
 </td>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#total_@Model.Id").focusin(function () {
+            $(this).data("previousVal", $(this).val().replace(",", ".").replace(/\s+/g, ''));
+        });
+
+        $("#total").data("previousValue", $("#total").text());
+
+        $("#bSave_@Model.Id").click(function (o) {
+            $("#total").data("previousValue", $("#total").text());
+        })
+
+        $("#total_@Model.Id").change(function (o) {
+
+            var prev = parseFloat($(this).data("previousVal"));
+            var current = parseFloat($(this).val().replace(",", ".").replace(/\s+/g, ''));
+            var total = parseFloat($("#total").text().replace(',', '.'));
+            $(this).data("previousVal", current);
+            total = total - prev + current;        
+            $("#total").text(total.toFixed(2));
+        });
+
+        $("#bCancel_@Model.Id").click(function (o) {
+            $("#total").text($("#total").data("previousValue"));
+            o.preventDefault();
+            $("#item_@Model.Id").load("/Home/OneSaleById/@Model.Id");
+        })
+
+    })
+</script>

@@ -25,5 +25,7 @@ namespace Statistics.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:N}")]        
         public double Total { get; set; }
 
+        public string submit { get; set; }
+
     }
 }

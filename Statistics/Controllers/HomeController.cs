@@ -105,6 +105,8 @@ namespace Statistics.Controllers
         {
             if (!ModelState.IsValid)
                 return ReturnFromEditSale(model, false);
+            if (model.submit == "Cancel")
+                return ReturnFromEditSale(model, true);
 
             bool res = _salesManager.UpdateSale(model);
             if (!res)
@@ -113,13 +115,13 @@ namespace Statistics.Controllers
             return ReturnFromEditSale(model, res);
         }
 
-        [HttpGet, HttpPost]
+
         [Authorize(Roles = "administrators")]
         public ActionResult DeleteSale(int id)
         {
             bool res = _salesManager.DeleteSale(id);
             if (Request.IsAjaxRequest())
-                return Json(new { result = res });
+                return Json(res.ToString().ToLower(), JsonRequestBehavior.AllowGet);
             if (!res)
             {
                 ErrorViewModel err = new ErrorViewModel()
@@ -129,6 +131,12 @@ namespace Statistics.Controllers
                 return View("ErrorView", err);
             }
             return RedirectToAction("Index");
+        }
+
+        public PartialViewResult OneSaleById(int id)
+        {
+            var sale = _salesManager.GetSale(id);
+            return PartialView("StatisticsItem", sale);
         }
 
         protected override void Dispose(bool disposing)
