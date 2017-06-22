@@ -1,0 +1,35 @@
+﻿@model Statistics.Models.SaleViewModel
+
+@{
+    ViewBag.Title = "Edit Sale";
+}
+
+<h2>Edit Sale</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.SaleDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Manager)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Customer)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Product)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Total)
+        </th>
+        <th></th>
+    </tr>
+    <tr>
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    </tr>
+    @Html.Partial("EditSaleData", Model)
+
+</table>
+
+@Html.ActionLink("Back", "Index", new { controller = "Home" }, new { @class = "btn btn-default" })

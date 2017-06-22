@@ -267,6 +267,8 @@
     <Content Include="Views\Home\CreateSale.cshtml" />
     <Content Include="Views\Home\StatisticsData.cshtml" />
     <Content Include="Views\Home\StatisticsItem.cshtml" />
+    <Content Include="Views\Home\EditSale.cshtml" />
+    <Content Include="Views\Home\EditSaleData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201706141655418_InitialCreate.resx">

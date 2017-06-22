@@ -34,3 +34,22 @@
 </table>
 
 @Html.ActionLink("Back", "Index", new { controller = "Home" }, new { @class = "btn btn-default" })
+
+<script type="text/javascript">
+    function delClick(id) {
+        var element = $("#item_".concat(id));
+
+        if (confirm("Delete this sale?")) {
+            $.ajax({
+                type: "POST",
+                data: { "id": id },
+                url: "DeleteSale",
+            }).done(function (res) {
+                element.empty;
+            });
+        };
+        element.empty();
+        return false;
+    }
+
+</script>

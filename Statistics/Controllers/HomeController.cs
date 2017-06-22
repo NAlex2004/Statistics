@@ -81,7 +81,7 @@ namespace Statistics.Controllers
                 return RedirectToAction("Index");
 
             if (Request.IsAjaxRequest())
-                return PartialView(sale);
+                return PartialView("EditSaleData", sale);
             return View(sale);
         }
 
@@ -95,7 +95,7 @@ namespace Statistics.Controllers
             }
 
             if (Request.IsAjaxRequest())
-                return PartialView("EditSale", model);
+                return PartialView("EditSaleData", model);
             return View("EditSale", model);
         }
 
@@ -111,6 +111,13 @@ namespace Statistics.Controllers
                 ModelState.AddModelError("", "Update faled..");
 
             return ReturnFromEditSale(model, res);
+        }
+
+        [HttpGet, HttpPost]
+        [Authorize(Roles = "administrators")]
+        public ActionResult DeleteSale(int id)
+        {
+
         }
 
         protected override void Dispose(bool disposing)
