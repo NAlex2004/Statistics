@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Statistics.Models.SaleViewModel>
+
+@{
+    ViewBag.Title = "Sales Statistics";
+}
+
+<h2>Sales</h2>
+
+<p>
+    @Html.ActionLink("Add New sale", "CreateSale")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.SaleDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Manager)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Customer)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Product)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Total)
+        </th>
+        <th></th>
+    </tr>
+
+    @Html.Partial("StatisticsData", Model)
+
+</table>
+
+@Html.ActionLink("Back", "Index", new { controller = "Home" }, new { @class = "btn btn-default" })

@@ -1,16 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
 namespace Statistics.Models
 {
-    public struct SaleFilterModel
+    public class SaleFilterModel
     {
-        public string Customer;
-        public string Manager;
-        public string Product;
-        public DateTime? StartDate;
-        public DateTime? EndDate;
+        public string Customer { get; set; }
+        public string Manager { get; set; }
+        public string Product { get; set; }
+
+        [DataType(DataType.Date)]
+        [Display(Name = "From date")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd.MM.yyyy}")]
+        public DateTime? StartDate { get; set; }
+
+        [DataType(DataType.Date)]
+        [Display(Name = "To date")]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd.MM.yyyy}")]
+        public DateTime? EndDate { get; set; }
     }
 }

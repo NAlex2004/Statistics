@@ -22,13 +22,9 @@ namespace NAlex.Selling.DAL.Repositories
                 throw new ArgumentNullException("context");
 
             _context = context;
-
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<TEntity, TDto>();
-                cfg.CreateMap<TDto, TEntity>();
-            });
             
+            Mapper.CreateMap<TEntity, TDto>();
+            Mapper.CreateMap<TDto, TEntity>();                        
         }
 
         public virtual TDto Get(TKey Id)

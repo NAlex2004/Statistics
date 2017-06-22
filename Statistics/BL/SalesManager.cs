@@ -9,6 +9,7 @@ using NAlex.Selling.DTO.Classes;
 using Statistics.Models;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using System.Linq.Expressions;
 
 namespace Statistics.BL
 {
@@ -19,41 +20,50 @@ namespace Statistics.BL
         public SalesManager(ISalesUoW unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            Mapper.Initialize(cfg =>
-            {
-                cfg.CreateMap<SaleDTO, SaleViewModel>()
-                    .ForMember<string>(dst => dst.Customer, opt => opt.MapFrom(src => src.Customer.CustomerName))
-                    .ForMember<string>(dst => dst.Manager, opt => opt.MapFrom(src => src.Manager.LastName))
-                    .ForMember<string>(dst => dst.Product, opt => opt.MapFrom(src => src.Product.ProductName));
+            Mapper.CreateMap<SaleDTO, SaleViewModel>()
+                    .ForMember(dst => dst.Customer, opt => opt.MapFrom(src => src.Customer.CustomerName))
+                    .ForMember(dst => dst.Manager, opt => opt.MapFrom(src => src.Manager.LastName))
+                    .ForMember(dst => dst.Product, opt => opt.MapFrom(src => src.Product.ProductName));
 
-                cfg.CreateMap<SaleViewModel, SaleDTO>()
-                    .ForMember<string>(dst => dst.Customer.CustomerName, opt => opt.MapFrom(src => src.Customer))
-                    .ForMember<string>(dst => dst.Manager.LastName, opt => opt.MapFrom(src => src.Manager))
-                    .ForMember<string>(dst => dst.Product.ProductName, opt => opt.MapFrom(src => src.Product));                
-            });
+            Mapper.CreateMap<SaleViewModel, SaleDTO>()
+                .ForMember(dst => dst.Customer, opt => opt.MapFrom(src => new CustomerDTO() { CustomerName = src.Customer, Id = 0 }))
+                .ForMember(dst => dst.Manager, opt => opt.MapFrom(src => new ManagerDTO() { LastName = src.Manager, Id = 0 }))
+                .ForMember(dst => dst.Product, opt => opt.MapFrom(src => new ProductDTO() { ProductName = src.Product, Id = 0, Price = 0 }));
+        }               
+
+        public SaleViewModel GetSale(int id)
+        {
+            var sale = _unitOfWork.Sales.Get(id);
+            SaleViewModel model = null;
+            if (sale != null)
+                model = ViewModelFromDTO(sale);
+            return model;
         }
 
-        public IEnumerable<SaleViewModel> GetSales(Func<SaleViewModel, bool> condition,
-            Func<IEnumerable<SaleViewModel>, IOrderedEnumerable<SaleViewModel>> orderBy = null)
+        public IEnumerable<SaleViewModel> GetSales(SaleFilterModel filter, Func<IEnumerable<SaleDTO>, IOrderedEnumerable<SaleDTO>> orderBy = null)
         {
-            Func<SaleDTO, bool> dtoCondition = Mapper.Map<Func<SaleDTO, bool>>(condition);
-            Func<IEnumerable<SaleDTO>, IOrderedEnumerable<SaleDTO>> dtoOrder =
-                Mapper.Map<Func<IEnumerable<SaleDTO>, IOrderedEnumerable<SaleDTO>>>(orderBy);
+            var exp = PredicateBuilder.True<SaleDTO>();
+            if (!string.IsNullOrEmpty(filter.Customer))
+                exp = exp.And(s => s.Customer.CustomerName.ToLower().Contains(filter.Customer.ToLower()));
+            if (!string.IsNullOrEmpty(filter.Manager))
+                exp = exp.And(s => s.Manager.LastName.ToLower().Contains(filter.Manager.ToLower()));
+            if (!string.IsNullOrEmpty(filter.Product))
+                exp = exp.And(s => s.Product.ProductName.ToLower().Contains(filter.Product.ToLower()));
+            if (filter.StartDate.HasValue)
+                exp = exp.And(s => s.SaleDate >= filter.StartDate.Value);
+            if (filter.EndDate.HasValue)
+                exp = exp.And(s => s.SaleDate <= filter.EndDate.Value);
+            var sales = _unitOfWork.Sales.Get(exp.Compile(), orderBy);
 
-            var sales = _unitOfWork.Sales.Get(dtoCondition, dtoOrder);
+            if (sales != null)
+                return sales.Select(s => ViewModelFromDTO(s));
 
-            return Mapper.Map<IEnumerable<SaleViewModel>>(sales);
+            return new SaleViewModel[0];
         }
 
-        public IEnumerable<SaleViewModel> GetSales(SaleFilterModel filter, Func<IEnumerable<SaleViewModel>, IOrderedEnumerable<SaleViewModel>> orderBy = null)
+        public SaleViewModel ViewModelFromDTO(SaleDTO dto)
         {
-            Func<SaleViewModel, bool> condition = m => !string.IsNullOrEmpty(filter.Product) ? m.Product.Contains(filter.Product) : true
-                && !string.IsNullOrEmpty(filter.Manager) ? m.Manager.Contains(filter.Manager) : true
-                && !string.IsNullOrEmpty(filter.Customer) ? m.Customer.Contains(filter.Customer) : true
-                && filter.StartDate.HasValue ? m.SaleDate >= filter.StartDate.Value : true
-                && filter.EndDate.HasValue ? m.SaleDate <= filter.EndDate : true;
-
-            return GetSales(condition, orderBy);
+            return Mapper.Map<SaleViewModel>(dto);
         }
 
         private void FillSaleDTOFromModel(SaleDTO sale, SaleViewModel saleModel)

@@ -1,0 +1,8 @@
+﻿@model IEnumerable<Statistics.Models.SaleViewModel>
+
+@foreach (var item in Model)
+{
+    <tr id="item_@item.Id">
+        @Html.Partial("StatisticsItem", item)
+    </tr>
+}

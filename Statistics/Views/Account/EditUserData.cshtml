@@ -72,10 +72,10 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $("#bCancel_@Model.Id").click(function (o) {
-            o.preventDefault();
+            o.preventDefault(); 
             $("#@Model.Id").load("OneUserById/@Model.Id");
         })
-
+    
         $.validator.unobtrusive.parse("#@Model.Id")
     })
 </script>

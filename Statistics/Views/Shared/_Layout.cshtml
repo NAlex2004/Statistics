@@ -46,6 +46,20 @@
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/unobtrusive")
     @Scripts.Render("~/bundles/jqueryval")
+    <script type="text/javascript">
+        $.validator.methods.range = function (value, element, param) {
+            var globalizedValue = value.replace(",", ".");
+            return this.optional(element) || (globalizedValue >= param[0] && globalizedValue <= param[1]);
+        }
+
+        $.validator.methods.number = function (value, element) {
+            return this.optional(element) || /^[0-9]+([\,\.]{1}[0-9]+)??$/.test(value);
+        }
+
+        $.validator.methods.date = function (value, element) {
+            return this.optional(element) || moment(value, "DD.MM.YYYY", true).isValid();
+        };
+    </script>
     @RenderSection("scripts", required: false)
 </body>
 </html>
