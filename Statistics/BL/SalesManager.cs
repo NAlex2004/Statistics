@@ -124,6 +124,20 @@ namespace Statistics.BL
             return false;
         }
 
+        public bool DeleteSale(int id)
+        {
+            try
+            {
+                _unitOfWork.Sales.Remove(id);
+                _unitOfWork.SaveChanges();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         #region IDisposable Support
         private bool disposedValue = false; 
 

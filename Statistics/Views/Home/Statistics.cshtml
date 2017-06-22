@@ -44,8 +44,9 @@
                 type: "POST",
                 data: { "id": id },
                 url: "DeleteSale",
-            }).done(function (res) {
-                element.empty;
+            }).done(function (data) {
+                if (data.result)
+                    element.empty;
             });
         };
         element.empty();

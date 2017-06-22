@@ -117,7 +117,18 @@ namespace Statistics.Controllers
         [Authorize(Roles = "administrators")]
         public ActionResult DeleteSale(int id)
         {
-
+            bool res = _salesManager.DeleteSale(id);
+            if (Request.IsAjaxRequest())
+                return Json(new { result = res });
+            if (!res)
+            {
+                ErrorViewModel err = new ErrorViewModel()
+                {
+                    Errors = new List<string>() { "Delete failed..." }
+                };
+                return View("ErrorView", err);
+            }
+            return RedirectToAction("Index");
         }
 
         protected override void Dispose(bool disposing)
