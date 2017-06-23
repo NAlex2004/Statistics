@@ -36,7 +36,8 @@ namespace Statistics.Controllers
         {
             var result = _salesManager.GetSales(model);
             if (Request.IsAjaxRequest())
-                return PartialView("Statistics", result);
+                return Json(result, JsonRequestBehavior.AllowGet);
+            //return PartialView("Statistics", result);
             return View("Statistics", result);
         }
 

@@ -17,7 +17,9 @@ namespace Statistics
 
             bundles.Add(new ScriptBundle("~/bundles/unobtrusive").Include(
                         "~/Scripts/jquery.unobtrusive*"));
-            
+
+            bundles.Add(new ScriptBundle("~/bundles/statistics").Include(
+                        "~/Scripts/statistics*"));
             // Используйте версию Modernizr для разработчиков, чтобы учиться работать. Когда вы будете готовы перейти к работе,
             // используйте средство сборки на сайте http://modernizr.com, чтобы выбрать только нужные тесты.
             bundles.Add(new ScriptBundle("~/bundles/modernizr").Include(
