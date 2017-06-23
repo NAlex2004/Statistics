@@ -17,7 +17,12 @@ namespace Statistics.Controllers
     [Authorize]
     public class AccountController : Controller
     {
-        private AccountManager _accountManager = new AccountManager();
+        private IAccountManager _accountManager;
+
+        public AccountController(IAccountManager accountManager)
+        {
+            _accountManager = accountManager;
+        }
 
         [AllowAnonymous]
         [HttpGet]

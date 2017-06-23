@@ -15,7 +15,7 @@ using System.Data.Entity;
 
 namespace Statistics.Identity
 {    
-    public class AccountManager
+    public class AccountManager : IAccountManager
     {
         protected IQueryable<UserViewModel> GetUsers(IOwinContext owinContext)
         {

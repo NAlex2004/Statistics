@@ -13,7 +13,7 @@ using System.Linq.Expressions;
 
 namespace Statistics.BL
 {
-    public class SalesManager: IDisposable
+    public class SalesManager : ISalesManager
     {
         private ISalesUoW _unitOfWork;
 

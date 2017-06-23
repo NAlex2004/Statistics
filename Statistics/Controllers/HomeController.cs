@@ -14,11 +14,11 @@ namespace Statistics.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private SalesManager _salesManager;
+        private ISalesManager _salesManager;
 
-        public HomeController()
+        public HomeController(ISalesManager saleManager)
         {
-            _salesManager = new SalesManager(new SalesUoW());
+            _salesManager = saleManager;
         }
 
         public ActionResult Index()

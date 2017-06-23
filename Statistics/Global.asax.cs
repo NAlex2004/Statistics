@@ -16,6 +16,7 @@ namespace Statistics
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
+            DependencyResolver.SetResolver(new DResolver());
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
