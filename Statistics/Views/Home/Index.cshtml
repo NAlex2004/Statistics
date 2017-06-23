@@ -107,8 +107,6 @@
                 }).done(function (res) {
                     var isAdmin = @AccountManager.IsAdmin(Request.GetOwinContext(), User.Identity.Name).ToString().ToLower();
                     statisticsView(res, "#result", "chartContainer", isAdmin);
-                    //$("#result").empty;
-                    //$("#result").html(res);
                 });
             }
 
