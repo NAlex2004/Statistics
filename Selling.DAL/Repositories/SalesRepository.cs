@@ -17,30 +17,32 @@ namespace NAlex.Selling.DAL.Repositories
         {
         }
 
-        protected void FillSaleNavigationProperties(Sale sale, SaleDTO sourceDto)
+        protected void FillSaleNavigationProperties(Sale sale, SaleDTO sourceDto, bool isUpdateAction = false)
         {
-            // если уже вставляли и не сохраняли
-            if (sourceDto.Customer.Id == 0)
+            if (!isUpdateAction) // при вставке вставляются детки
             {
-                var cust = _context.Set<Customer>().Local.FirstOrDefault(c => Mapper.Map<CustomerDTO>(c).Equals(sourceDto.Customer));
-                if (cust != null)
-                    _context.Entry<Customer>(cust).State = EntityState.Detached;
-            }
+                // если уже вставляли и не сохраняли
+                if (sourceDto.Customer.Id == 0)
+                {
+                    var cust = _context.Set<Customer>().Local.FirstOrDefault(c => Mapper.Map<CustomerDTO>(c).Equals(sourceDto.Customer));
+                    if (cust != null)
+                        _context.Entry<Customer>(cust).State = EntityState.Detached;
+                }
 
-            if (sourceDto.Product.Id == 0)
-            {
-                var prod = _context.Set<Product>().Local.FirstOrDefault(p => Mapper.Map<ProductDTO>(p).Equals(sourceDto.Product));
-                if (prod != null)
-                    _context.Entry<Product>(prod).State = EntityState.Detached;
-            }
+                if (sourceDto.Product.Id == 0)
+                {
+                    var prod = _context.Set<Product>().Local.FirstOrDefault(p => Mapper.Map<ProductDTO>(p).Equals(sourceDto.Product));
+                    if (prod != null)
+                        _context.Entry<Product>(prod).State = EntityState.Detached;
+                }
 
-            if (sourceDto.Manager.Id == 0)
-            {
-                var man = _context.Set<Manager>().Local.FirstOrDefault(m => Mapper.Map<ManagerDTO>(m).Equals(sourceDto.Manager));
-                if (man != null)
-                    _context.Entry<Manager>(man).State = EntityState.Detached;
+                if (sourceDto.Manager.Id == 0)
+                {
+                    var man = _context.Set<Manager>().Local.FirstOrDefault(m => Mapper.Map<ManagerDTO>(m).Equals(sourceDto.Manager));
+                    if (man != null)
+                        _context.Entry<Manager>(man).State = EntityState.Detached;
+                }
             }
-
             // ищем в базе           
             var customer = _context.Set<Customer>().FirstOrDefault(c => c.CustomerName == sourceDto.Customer.CustomerName);
             if (customer != null)
@@ -92,6 +94,13 @@ namespace NAlex.Selling.DAL.Repositories
                 return false;
 
             FillSaleNavigationProperties(sale, entity);
+
+            if (sale.ProductId == 0)
+                _context.Set<Product>().Add(sale.Product);
+            if (sale.CustomerId == 0)
+                _context.Set<Customer>().Add(sale.Customer);
+            if (sale.ManagerId == 0)
+                _context.Set<Manager>().Add(sale.Manager);
 
             _context.Entry<Sale>(existing).CurrentValues.SetValues(sale);
             _context.Entry<Sale>(existing).State = EntityState.Modified;

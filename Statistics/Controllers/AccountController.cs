@@ -112,7 +112,14 @@ namespace Statistics.Controllers
         [Authorize(Roles = "administrators")]
         public ActionResult EditUser(string id)
         {
-            return View(id);
+            if (TempData["modelErrors"] != null)
+            {
+                List<string> errors = (List<string>)TempData["modelErrors"];
+                foreach (var error in errors)
+                    ModelState.AddModelError("", error);
+            }
+
+            return View("EditUser", model: id);
         }
 
         [Authorize(Roles = "administrators")]
@@ -122,7 +129,7 @@ namespace Statistics.Controllers
             if (user == null)
                 return null;
             user.EditMode = UserEditMode.Edit;
-            return PartialView(user);
+            return PartialView("EditUserData", model: user);
         }
 
         protected ActionResult ReturnFromEditUser(UserViewModel model, bool success)
@@ -139,13 +146,21 @@ namespace Statistics.Controllers
             
             if (Request.IsAjaxRequest())
                 return PartialView("EditUserData", model);
-            return View("EditUser", model.Id);            
+            //return View("EditUser", model: model.Id);
+            List<string> errors = new List<string>();
+            foreach (var modelState in ModelState.Values)
+                foreach (var error in modelState.Errors)
+                    errors.Add(error.ErrorMessage);
+            TempData["modelErrors"] = errors;
+            Response.Redirect(Url.Action("EditUser", new { id = model.Id}), true);
+
+            return null;
         }
 
         [HttpPost]
         [Authorize(Roles = "administrators")]        
         public ActionResult EditUserData(UserViewModel model)
-        {
+        {           
             if (model.submit == "Cancel")
                 return ReturnFromEditUser(model, true);
 
@@ -162,7 +177,7 @@ namespace Statistics.Controllers
                 }
 
                 return ReturnFromEditUser(model, true);
-            }
+            }            
 
             return ReturnFromEditUser(model, false);
         }

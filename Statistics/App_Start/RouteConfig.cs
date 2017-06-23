@@ -12,11 +12,18 @@ namespace Statistics
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
-            routes.MapRoute( 
-                name: "",             
+            routes.MapRoute(
+                name: "",
                 url: "Account/Users/{page}",
                 defaults: new { controller = "Account", action = "Users", page = UrlParameter.Optional }
             );
+            
+            //routes.MapRoute(
+            //    name: "",
+            //    url: "Account/EditUser/userId",
+            //    defaults: new { controller = "Account", action = "EditUser" }
+            //);
+
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",

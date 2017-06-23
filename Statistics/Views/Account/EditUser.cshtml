@@ -7,6 +7,7 @@
 <h2>Edit User</h2>
 
 <div id="@Model" class="form-horizontal">
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
     @Html.Action("EditUserData", new { controller="Account", id = Model})
 </div>
 
