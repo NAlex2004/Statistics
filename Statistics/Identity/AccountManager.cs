@@ -216,7 +216,7 @@ namespace Statistics.Identity
             return userManager.Delete(user);
         }
 
-        public static bool IsAdmin(IOwinContext owinContext, string userName)
+        public bool IsAdmin(IOwinContext owinContext, string userName)
         {
             if (string.IsNullOrEmpty(userName))
                 return false;

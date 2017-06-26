@@ -18,7 +18,7 @@ namespace Statistics.Controllers
 
         public HomeController(ISalesManager saleManager)
         {
-            _salesManager = saleManager;
+            _salesManager = saleManager; 
         }
 
         public ActionResult Index()

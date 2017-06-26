@@ -89,7 +89,7 @@ namespace Statistics.Controllers
 
                 if (!ModelState.IsValid
                     ||
-                    (!currentUserName.Equals(model.UserName) && !AccountManager.IsAdmin(HttpContext.GetOwinContext(), currentUserName)))
+                    (!currentUserName.Equals(model.UserName) && !_accountManager.IsAdmin(HttpContext.GetOwinContext(), currentUserName)))
                 {
                     model.Password = model.OldPassword = model.PasswordConfirm = "";
                     return View(model);

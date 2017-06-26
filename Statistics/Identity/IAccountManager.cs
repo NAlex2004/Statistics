@@ -21,5 +21,6 @@ namespace Statistics.Identity
         void SignOut(IOwinContext owinContext);
         IdentityResult UpdateUser(IOwinContext owinContext, UserViewModel userModel);
         IdentityResult UpdateUserRoles(IOwinContext owinContext, RolesViewModel model);
+        bool IsAdmin(IOwinContext owinContext, string userName);
     }
 }

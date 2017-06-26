@@ -1,9 +1,10 @@
 ﻿function statisticsView(data, targetId, chartId, isAdmin) {
     var chartSelected = $('input[name="chartRadio"]:checked').val();
 
-    var html = "<h2>Sales</h2> \n"
-        + "<p><a href='/Home/CreateSale'>Add New sale</a></p> \n"
-        + '<table class="table"> \n'
+    var html = "<h2>Sales</h2> \n";
+    if (isAdmin)
+        html += "<p><a href='/Home/CreateSale'>Add New sale</a></p> \n";
+    html += '<table class="table"> \n'
         + '<tbody><tr> \n'
         + '<th>Sale date</th> \n'
         + '<th>Manager</th> \n'

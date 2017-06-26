@@ -27,9 +27,9 @@
 </td>
 <td>
     @Html.HiddenFor(item => item.Id)
-    @if (AccountManager.IsAdmin(Request.GetOwinContext(), User.Identity.Name))
+    @if (MvcApplication.IsAdmin(Request.GetOwinContext(), User.Identity.Name))
     {
-        Ajax.ActionLink("Edit", "EditSale", new { id = Model.Id }, editOptions); 
+        @Ajax.ActionLink("Edit", "EditSale", new { id = Model.Id }, editOptions) @:|
         <a href = "@Url.Action("DeleteSale", new { id = Model.Id })" id = "delLink_@Model.Id" onclick = "return delClick(@Model.Id);" > Delete </a>
     }    
 </td>

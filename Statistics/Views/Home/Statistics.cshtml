@@ -1,4 +1,6 @@
-﻿@model IEnumerable<Statistics.Models.SaleViewModel>
+﻿@using Statistics.Identity
+
+@model IEnumerable<Statistics.Models.SaleViewModel>
 
 @{
     ViewBag.Title = "Sales Statistics";
@@ -7,7 +9,10 @@
 <h2>Sales</h2>
 
 <p>
-    @Html.ActionLink("Add New sale", "CreateSale")
+    @if (MvcApplication.IsAdmin(Request.GetOwinContext(), User.Identity.Name))
+    {
+        Html.ActionLink("Add New sale", "CreateSale");
+    }    
 </p>
 <table class="table">
     <tr>
