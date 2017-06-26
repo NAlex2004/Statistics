@@ -42,7 +42,7 @@ namespace Statistics.Identity
             var query = orderBy == null ? GetUsers(owinContext).OrderBy(u => u.UserName) : orderBy.Compile()(GetUsers(owinContext));
 
             if (pager == null)
-                return query;
+                return query.ToArray();
 
             return GetUsersPage(query, pager);
         }
@@ -55,7 +55,7 @@ namespace Statistics.Identity
             int skip = pager.ItemsPerPage * (pager.CurrentPage - 1);
             var page = query.Skip(skip).Take(pager.ItemsPerPage);            
             
-            return page;
+            return page.ToArray();
         }
 
         public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, Expression<Func<UserViewModel, bool>> condition,
@@ -65,7 +65,7 @@ namespace Statistics.Identity
             var orderedQuery = orderBy == null ? query.OrderBy(u => u.UserName)
                 : orderBy.Compile()(query);
             if (pager == null)
-                return orderedQuery;
+                return orderedQuery.ToArray();
             return GetUsersPage(orderedQuery, pager);            
         }
 
@@ -94,13 +94,6 @@ namespace Statistics.Identity
         {
             owinContext.Authentication.SignOut();
         }
-
-        //public async Task<AppUser> GetCurrentUserAsync(IOwinContext owinContext)
-        //{
-        //    var id = owinContext.Authentication.User.Identity.GetUserId();
-        //    AppUser user = await owinContext.GetUserManager<AppUserManager>().FindByIdAsync(id);
-        //    return user;
-        //}   
 
         public IdentityResult ChangePassword(IOwinContext owinContext, ChangePasswordViewModel model)
         {
@@ -196,8 +189,6 @@ namespace Statistics.Identity
                 user.Email = userModel.Email;
                
                 IdentityResult result = userManager.Update(user);
-
-                // !!! ??? 
 
                 if (result.Succeeded)
                 {

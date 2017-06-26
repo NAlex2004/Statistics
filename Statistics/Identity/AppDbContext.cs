@@ -11,7 +11,7 @@ namespace Statistics.Identity
     {
         public AppDbContext(): base("Identity")
         {
-            //Database.SetInitializer(new DropCreateDatabaseIfModelChanges<AppDbContext>());
+            
         }
 
         public static AppDbContext Create()

@@ -23,11 +23,7 @@ namespace Statistics.Controllers
 
         public ActionResult Index()
         {
-            SaleFilterModel model = new SaleFilterModel()
-            {                
-                //StartDate = DateTime.Now.AddDays(-1),
-                //EndDate = DateTime.Now
-            };
+            SaleFilterModel model = new SaleFilterModel();
             return View(model);
         }
 
@@ -37,7 +33,6 @@ namespace Statistics.Controllers
             var result = _salesManager.GetSales(model);
             if (Request.IsAjaxRequest())
                 return Json(result, JsonRequestBehavior.AllowGet);
-            //return PartialView("Statistics", result);
             return View("Statistics", result);
         }
 

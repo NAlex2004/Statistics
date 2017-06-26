@@ -17,12 +17,6 @@ namespace Statistics
                 url: "Account/Users/{page}",
                 defaults: new { controller = "Account", action = "Users", page = UrlParameter.Optional }
             );
-            
-            //routes.MapRoute(
-            //    name: "",
-            //    url: "Account/EditUser/userId",
-            //    defaults: new { controller = "Account", action = "EditUser" }
-            //);
 
             routes.MapRoute(
                 name: "Default",

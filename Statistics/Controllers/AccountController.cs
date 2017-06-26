@@ -70,11 +70,9 @@ namespace Statistics.Controllers
         [HttpGet]
         public ActionResult ChangePassword(string returnUrl)
         {            
-            //AppUser user = await _accountManager.GetCurrentUserAsync(HttpContext.GetOwinContext());
-            
             ChangePasswordViewModel model = new ChangePasswordViewModel()
             {
-                UserName = User.Identity.Name, //user.UserName,
+                UserName = User.Identity.Name, 
                 ReturnUrl = returnUrl
             };
             
@@ -151,7 +149,7 @@ namespace Statistics.Controllers
             
             if (Request.IsAjaxRequest())
                 return PartialView("EditUserData", model);
-            //return View("EditUser", model: model.Id);
+            
             List<string> errors = new List<string>();
             foreach (var modelState in ModelState.Values)
                 foreach (var error in modelState.Errors)

@@ -32,11 +32,6 @@
             mapVal = chartMap.get(itemKey);
         chartMap.set(itemKey, mapVal + parseFloat(item.Total));
 
-        //if (chartSelected == 'SaleDate')
-        //    chartArray.push([moment(item.SaleDate).format('DD.MM.YYYY'), parseFloat(item.Total)]);
-        //else
-        //    chartArray.push([item[chartSelected].toString(), parseFloat(item.Total)]);
-        
         total += item.Total;
         html += '<tr id="item_'.concat(item.Id).concat('">\n');        
         html += '<td>' + moment(item.SaleDate).format('DD.MM.YYYY') + '</td>\n';
