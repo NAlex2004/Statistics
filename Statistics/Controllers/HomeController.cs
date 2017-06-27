@@ -37,12 +37,18 @@ namespace Statistics.Controllers
         }
 
         [Authorize(Roles = "administrators")]
-        public ActionResult CreateSale()
+        public ActionResult CreateSale(int? createdID = null)
         {
             SaleViewModel model = new SaleViewModel()
             {
                 SaleDate = DateTime.Now
             };
+
+            if (createdID.HasValue)
+                ViewBag.CreatedId = createdID;
+
+            if (Request.IsAjaxRequest())
+                return PartialView(model);
 
             return View(model);
         }
@@ -61,7 +67,7 @@ namespace Statistics.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            bool res = false;// _salesManager.CreateSale(model);
+            bool res = _salesManager.CreateSale(model);
             if (!res)
             {
                 ErrorViewModel err = new ErrorViewModel()
@@ -70,10 +76,16 @@ namespace Statistics.Controllers
                     ReturnUrl = Url.Action("CreateSale")
                 };
 
+                if (Request.IsAjaxRequest())
+                    return PartialView("ErrorView", err);
                 return View("ErrorView", err);
             }
-            
-            return RedirectToAction("CreateSale");
+
+
+            //Response.Redirect(Url.Action("CreateSale", new { createdId = model.Id }), true);
+            //return null;
+
+            return RedirectToAction("CreateSale", new { createdId = model.Id });
         }
 
         [Authorize(Roles = "administrators")]

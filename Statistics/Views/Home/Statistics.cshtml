@@ -11,7 +11,7 @@
 <p>
     @if (MvcApplication.IsAdmin(Request.GetOwinContext(), User.Identity.Name))
     {
-        Html.ActionLink("Add New sale", "CreateSale");
+        @Html.ActionLink("Add New sale", "CreateSale")
     }    
 </p>
 <table class="table">

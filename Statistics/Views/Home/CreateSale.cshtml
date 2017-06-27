@@ -4,14 +4,13 @@
     ViewBag.Title = "Create new sale";
 }
 
-<h2>CreateSale</h2>
 
 @{ 
     AjaxOptions opt = new AjaxOptions()
     {
         HttpMethod = "POST",
-        UpdateTargetId = "newSale",
-        Url = Url.Action("CreateSale")
+        UpdateTargetId = "newSale"//,
+        //Url = Url.Action("CreateSale")
     };
 }
 
@@ -76,9 +75,30 @@
 @*<div>
     @Html.ActionLink("Back", "Index")
 </div>*@
+@Scripts.Render("~/bundles/jqueryval")
+<script type="text/javascript">
+        $.validator.methods.range = function (value, element, param) {
+            var globalizedValue = value.replace(",", ".");
+            return this.optional(element) || (globalizedValue >= param[0] && globalizedValue <= param[1]);
+        }
+
+        $.validator.methods.number = function (value, element) {
+            return this.optional(element) || /^[0-9]+([\,\.]{1}[0-9]+)??$/.test(value);
+        }
+
+        $.validator.methods.date = function (value, element) {
+            return this.optional(element) || moment(value, "DD.MM.YYYY", true).isValid();
+        };
+</script>
 
 <script type="text/javascript">
     $(document).ready(function () {
+        var id = parseInt(@ViewBag.CreatedId);
+        
+        if (!isNaN(id)) {
+            appendSaleToTable(id);
+        }
+
         $(bCancel).click(function (o) {
             o.preventDefault();
             $("#newSale").html("");

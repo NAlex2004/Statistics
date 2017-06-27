@@ -3,17 +3,19 @@
 
     var html = "<h2>Sales</h2> \n";
     if (isAdmin)
-        html += '<p><a data-ajax="true" data-ajax-method="GET" data-ajax-mode="replace" data-ajax-update="#newSale" data-ajax-url="/Home/CreateSale" href="/Home/CreateSale">Create sale</a></p> \n';
+        html += '<p><a data-ajax="true" data-ajax-method="GET" data-ajax-mode="replace" data-ajax-update="#newSale" data-ajax-url="/Home/CreateSale" href="/Home/CreateSale">Add New sale</a></p> \n';
         //html += "<p><a href='/Home/CreateSale'>Add New sale</a></p> \n";
     html += '<table class="table"> \n'
-        + '<tbody id="resultHead"><tr> \n'
+        + '<thead id="resultHead"><tr> \n'
         + '<th>Sale date</th> \n'
         + '<th>Manager</th> \n'
         + '<th>Customer</th> \n'
         + '<th>Product</th> \n'
         + '<th>Total</th> \n'
         + '<th></th> \n'
-        + '</tr> \n';
+        + '</tr> \n'
+        + '</thead> \n'
+        + '<tbody id="resultBody"> \n';
 
     var total = 0.0;
 
@@ -81,3 +83,8 @@ function drawChart(data, chartId) {
     chart.draw(chartData, options);
 }
  
+function appendSaleToTable(saleId) {
+    var itemId = "item_" + saleId;    
+    $("#resultBody").prepend('<tr id="' + itemId + '"></tr>');
+    $("#" + itemId).load("/Home/OneSaleById/" + saleId);
+}

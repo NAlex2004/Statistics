@@ -116,7 +116,11 @@ namespace Statistics.BL
                 try
                 {
                     _unitOfWork.SaveChanges();
-                    saleModel.Id = added.Id;
+                    var saved = _unitOfWork.Sales.Get(s => s.Customer.Equals(added.Customer)
+                        && s.Product.Equals(added.Product) && s.Manager.Equals(added.Manager)
+                        && s.Total.Equals(added.Total) && s.SaleDate.Equals(added.SaleDate)).FirstOrDefault();
+                    if (saved != null)
+                        saleModel.Id = saved.Id;
                     return true;
                 }
                 catch { }                
