@@ -3,9 +3,10 @@
 
     var html = "<h2>Sales</h2> \n";
     if (isAdmin)
-        html += "<p><a href='/Home/CreateSale'>Add New sale</a></p> \n";
+        html += '<p><a data-ajax="true" data-ajax-method="GET" data-ajax-mode="replace" data-ajax-update="#newSale" data-ajax-url="/Home/CreateSale" href="/Home/CreateSale">Create sale</a></p> \n';
+        //html += "<p><a href='/Home/CreateSale'>Add New sale</a></p> \n";
     html += '<table class="table"> \n'
-        + '<tbody><tr> \n'
+        + '<tbody id="resultHead"><tr> \n'
         + '<th>Sale date</th> \n'
         + '<th>Manager</th> \n'
         + '<th>Customer</th> \n'

@@ -6,8 +6,16 @@
 
 <h2>CreateSale</h2>
 
+@{ 
+    AjaxOptions opt = new AjaxOptions()
+    {
+        HttpMethod = "POST",
+        UpdateTargetId = "newSale",
+        Url = Url.Action("CreateSale")
+    };
+}
 
-@using (Html.BeginForm()) 
+@using (@Ajax.BeginForm(opt)) 
 {    
     
     <div class="form-horizontal">
@@ -56,14 +64,24 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create" class="btn btn-default" />
-                @Html.ActionLink("Cancel", "Index", "Home", new { @class = "btn btn-default" })
+                @*<input type="submit" value="Create" class="btn btn-default" />
+                @Html.ActionLink("Cancel", "Index", "Home", new { @class = "btn btn-default" })*@
+                <button id="bSave" type="submit" name="submit" value="Save" class="btn btn-default">Create</button>
+                <button id="bCancel" type="submit" name="submit" value="Cancel" class="btn btn-default">Cancel</button>                 
             </div>
         </div>
     </div>
 }
 
-<div>
+@*<div>
     @Html.ActionLink("Back", "Index")
-</div>
+</div>*@
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(bCancel).click(function (o) {
+            o.preventDefault();
+            $("#newSale").html("");
+        });
+    })
+</script>

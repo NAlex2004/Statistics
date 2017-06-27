@@ -45,33 +45,48 @@
    }
 </td>
 
+
 <script type="text/javascript">
     $(document).ready(function () {
-        $("#total_@Model.Id").focusin(function () {
-            $(this).data("previousVal", $(this).val().replace(",", ".").replace(/\s+/g, ''));
-        });
+    $("#total_@Model.Id").focusin(function () {
+        $(this).data("previousValue", $(this).val().replace(",", ".").replace(/\s+/g, ''));        
+    });
 
+    $("#total").data("previousValue", $("#total").text());
+
+    $("#bSave_@Model.Id").click(function (o) {
         $("#total").data("previousValue", $("#total").text());
-
-        $("#bSave_@Model.Id").click(function (o) {
-            $("#total").data("previousValue", $("#total").text());
-        })
-
-        $("#total_@Model.Id").change(function (o) {
-
-            var prev = parseFloat($(this).data("previousVal"));
-            var current = parseFloat($(this).val().replace(",", ".").replace(/\s+/g, ''));
-            var total = parseFloat($("#total").text().replace(',', '.'));
-            $(this).data("previousVal", current);
-            total = total - prev + current;        
-            $("#total").text(total.toFixed(2));
-        });
-
-        $("#bCancel_@Model.Id").click(function (o) {
-            $("#total").text($("#total").data("previousValue"));
-            o.preventDefault();
-            $("#item_@Model.Id").load("/Home/OneSaleById/@Model.Id");
-        })
-
     })
+
+    $("#total_@Model.Id").change(function (o) {
+
+        var prev = parseFloat($(this).data("previousValue"));
+        var current = parseFloat($(this).val().replace(",", ".").replace(/\s+/g, ''));
+        var diff = $(this).data("diff");
+        if (diff == undefined)
+            diff = 0;        
+        diff += current - prev;
+        $(this).data("diff", diff);
+
+        var total = parseFloat($("#total").text().replace(',', '.'));
+        $(this).data("previousValue", current);
+        total = total - prev + current;
+        $("#total").text(total.toFixed(2));
+    });
+
+    $("#bCancel_@Model.Id").click(function (o) {
+
+        var diff = $("#total_@Model.Id").data("diff");
+        if (diff == undefined)
+            diff = 0;        
+        var currentTotal = parseFloat($("#total").text().replace(',', '.'));
+        var total = currentTotal - diff;
+        $("#total").text(total.toFixed(2));
+        $("#total").data("previousValue", $("#total").text());
+        //$("#total").text($("#total").data("previousValue"));
+        o.preventDefault();
+        $("#item_@Model.Id").load("/Home/OneSaleById/@Model.Id");
+    })
+
+})
 </script>

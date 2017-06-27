@@ -51,10 +51,17 @@ namespace Statistics.Controllers
         [Authorize(Roles = "administrators")]
         public ActionResult CreateSale(SaleViewModel model)
         {
+            if (model.submit == "Cancel")
+            {
+                if (Request.IsAjaxRequest())
+                    return Json("");
+                return RedirectToAction("Index");
+            }
+
             if (!ModelState.IsValid)
                 return View(model);
 
-            bool res = _salesManager.CreateSale(model);
+            bool res = false;// _salesManager.CreateSale(model);
             if (!res)
             {
                 ErrorViewModel err = new ErrorViewModel()
