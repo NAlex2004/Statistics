@@ -55,7 +55,7 @@
         <div class="form-group">
             <label class="control-label col-md-2">Roles for @Model.UserName:</label>
             <div class="col-md-10">                
-                <a href="@Url.Action("UserRoles", new { id = Model.Id })" class="btn btn-primary">Roles</a>                
+                <a href="@Url.Action("UserRoles", new { id = Model.Id })" class="btn btn-primary" onclick=@string.Format("return rolesClick(event, {0});", Model.Id)>Roles</a>                
             </div>
         </div>
 
@@ -68,6 +68,8 @@
     }
 }
 
+<div id="rolesDialog"></div>
+
 <script type="text/javascript">
     $(document).ready(function () {
         $("#bCancel_@Model.Id").click(function (o) {
@@ -77,4 +79,11 @@
     
         $.validator.unobtrusive.parse("#@Model.Id")
     })
+
+    function rolesClick(event, userId) {
+        event.preventDefault();
+        
+            
+        return false;
+    }
 </script>

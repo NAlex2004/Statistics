@@ -107,6 +107,7 @@ function pageClick(event, page, isAdmin) {
             "Product": $("#eProduct").val(),
             "StartDate": $("#eStartDate").val(),
             "EndDate": $("#eEndDate").val(),
+            "ItemsPerPage": $("#dlItemsPerPage").val(),
             "page" : page
         }                    
     }).done(function (res) {        

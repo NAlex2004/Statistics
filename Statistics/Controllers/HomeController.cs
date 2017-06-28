@@ -30,7 +30,8 @@ namespace Statistics.Controllers
                 {
                     page = 1
                 };
-
+                if (Session["ItemsPerPage"] != null)
+                    model.ItemsPerPage = (int)Session["ItemsPerPage"];
                 return View(model);
             }
 
@@ -41,12 +42,15 @@ namespace Statistics.Controllers
         [HttpPost]
         public ActionResult IndexPost(SaleFilterModel model)
         {
+            Session["ItemsPerPage"] = model.ItemsPerPage;
             return Statistics(model);
         }
 
         public ActionResult Statistics(SaleFilterModel model)
         {
-            PagerData pager = new PagerData() { ItemsPerPage = MvcApplication.ItemsPerPage, CurrentPage = model.page };
+            if (Session["ItemsPerPage"] != null)
+                model.ItemsPerPage = (int)Session["ItemsPerPage"];
+            PagerData pager = new PagerData() { ItemsPerPage = model.ItemsPerPage, CurrentPage = model.page };
             var result = _salesManager.GetSales(model, null, pager);
             if (Request.IsAjaxRequest())
                 return Json(new { CurrentPage = pager.CurrentPage, TotalPages = pager.TotalPages, Result = result }, JsonRequestBehavior.AllowGet);
