@@ -9,6 +9,7 @@
         UpdateTargetId = Model.Id
     };
 
+    
     using (Ajax.BeginForm(opt))
     {
         @Html.HiddenFor(m => m.Id)        
@@ -55,10 +56,10 @@
         <div class="form-group">
             <label class="control-label col-md-2">Roles for @Model.UserName:</label>
             <div class="col-md-10">                
-                <a href="@Url.Action("UserRoles", new { id = Model.Id })" class="btn btn-primary" onclick=@string.Format("return rolesClick(event, {0});", Model.Id)>Roles</a>                
+                <a id="aRoles_@Model.Id" href="@Url.Action("UserRoles", new { id = Model.Id })" class="btn btn-primary">Roles</a>                
             </div>
         </div>
-
+        <div id="rolesDialog_@Model.Id"></div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <button id="bSave_@Model.Id" type="submit" name="submit" value="Save" class="btn btn-default">Save</button>
@@ -68,22 +69,14 @@
     }
 }
 
-<div id="rolesDialog"></div>
-
 <script type="text/javascript">
     $(document).ready(function () {
         $("#bCancel_@Model.Id").click(function (o) {
-            o.preventDefault(); 
+            o.preventDefault();             
             $("#@Model.Id").load("OneUserById/@Model.Id");
-        })
-    
+        })           
+        
         $.validator.unobtrusive.parse("#@Model.Id")
     })
-
-    function rolesClick(event, userId) {
-        event.preventDefault();
-        
-            
-        return false;
-    }
+    
 </script>
