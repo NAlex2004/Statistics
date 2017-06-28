@@ -11,7 +11,7 @@ namespace Statistics.BL
         bool CreateSale(SaleViewModel saleModel);
         bool DeleteSale(int id);
         SaleViewModel GetSale(int id);
-        IEnumerable<SaleViewModel> GetSales(SaleFilterModel filter, Func<IEnumerable<SaleDTO>, IOrderedEnumerable<SaleDTO>> orderBy = null);
+        IEnumerable<SaleViewModel> GetSales(SaleFilterModel filter, Func<IQueryable<SaleDTO>, IOrderedQueryable<SaleDTO>> orderBy = null, PagerData pager = null);
         bool UpdateSale(SaleViewModel saleModel);
         SaleViewModel ViewModelFromDTO(SaleDTO dto);
     }

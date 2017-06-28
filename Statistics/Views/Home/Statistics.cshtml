@@ -1,6 +1,8 @@
 ﻿@using Statistics.Identity
+@using Statistics.Helpers
 
-@model IEnumerable<Statistics.Models.SaleViewModel>
+@*@model IEnumerable<Statistics.Models.SaleViewModel>*@
+@model Statistics.Models.SalesListModel
 
 @{
     ViewBag.Title = "Sales Statistics";
@@ -17,25 +19,43 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.SaleDate)
+            Sale date
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Manager)
+            Manager
+            @*@Html.DisplayNameFor(model => model.Manager)*@
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Customer)
+            Customer
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Product)
+            Product
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Total)
+            Total
         </th>
         <th></th>
     </tr>
 
-    @Html.Partial("StatisticsData", Model)
+    <tbody id="resultBody">
+        @Html.Partial("StatisticsData", Model.Sales)
 
+        <tr>
+            <td colspan="5">
+                @Html.Pager(Model.Pager, x => Url.Action("Index", "Home",
+                   new
+                   {
+                       Customer = Model.Filter.Customer,
+                       Manager = Model.Filter.Manager,
+                       Product = Model.Filter.Product,
+                       StartDate = Model.Filter.StartDate,
+                       EndDate = Model.Filter.EndDate,
+                       page = x
+                   }))
+            </td>
+        </tr>
+    </tbody>
+    
 </table>
 
 @Html.ActionLink("Back", "Index", new { controller = "Home" }, new { @class = "btn btn-default" })

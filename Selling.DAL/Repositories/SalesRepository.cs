@@ -15,6 +15,12 @@ namespace NAlex.Selling.DAL.Repositories
     {
         public SalesRepository(DbContext context): base(context)
         {
+            Mapper.CreateMap<Customer, CustomerDTO>();
+            Mapper.CreateMap<CustomerDTO, Customer>();
+            Mapper.CreateMap<Manager, ManagerDTO>();
+            Mapper.CreateMap<ManagerDTO, Manager>();
+            Mapper.CreateMap<Product, ProductDTO>();
+            Mapper.CreateMap<ProductDTO, Product>();
         }
 
         protected void FillSaleNavigationProperties(Sale sale, SaleDTO sourceDto, bool isUpdateAction = false)

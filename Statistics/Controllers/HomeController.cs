@@ -21,20 +21,44 @@ namespace Statistics.Controllers
             _salesManager = saleManager; 
         }
 
-        public ActionResult Index()
+        [ActionName("Index")]
+        public ActionResult IndexGet(SaleFilterModel model)
         {
-            SaleFilterModel model = new SaleFilterModel();
-            return View(model);
+            if (model == null || model.page == 0)
+            {
+                model = new SaleFilterModel()
+                {
+                    page = 1
+                };
+
+                return View(model);
+            }
+
+            return Statistics(model);
+        }        
+
+        [ActionName("Index")]
+        [HttpPost]
+        public ActionResult IndexPost(SaleFilterModel model)
+        {
+            return Statistics(model);
         }
 
-        [HttpPost]
-        public ActionResult Index(SaleFilterModel model)
+        public ActionResult Statistics(SaleFilterModel model)
         {
-            var result = _salesManager.GetSales(model);
+            PagerData pager = new PagerData() { ItemsPerPage = MvcApplication.ItemsPerPage, CurrentPage = model.page };
+            var result = _salesManager.GetSales(model, null, pager);
             if (Request.IsAjaxRequest())
-                return Json(result, JsonRequestBehavior.AllowGet);
-            return View("Statistics", result);
+                return Json(new { CurrentPage = pager.CurrentPage, TotalPages = pager.TotalPages, Result = result }, JsonRequestBehavior.AllowGet);
+            SalesListModel listModel = new SalesListModel()
+            {
+                Sales = result,
+                Pager = pager,
+                Filter = model
+            };
+            return View("Statistics", listModel);
         }
+
 
         [Authorize(Roles = "administrators")]
         public ActionResult CreateSale(int? createdID = null)

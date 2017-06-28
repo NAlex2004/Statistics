@@ -21,5 +21,7 @@ namespace Statistics.Models
         [Display(Name = "To date")]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd.MM.yyyy}")]
         public DateTime? EndDate { get; set; }
+
+        public int page { get; set; }
     }
 }

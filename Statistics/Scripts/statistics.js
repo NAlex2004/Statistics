@@ -23,8 +23,12 @@
     var chartMap = new Map();
     var itemKey;
 
-    for (var i = 0; i < data.length; i++) {
-        var item = data[i];
+    var res = data.Result;
+    var totalPages = data.TotalPages;
+    var currentPage = data.CurrentPage;
+
+    for (var i = 0; i < res.length; i++) {
+        var item = res[i];
                 
         if (chartSelected == 'SaleDate')
             itemKey = moment(item.SaleDate).format('DD.MM.YYYY');
@@ -56,8 +60,25 @@
 
     html += '<tr><td></td><td></td><td></td>\n';      
     html += '<td style="text-align:right; font-weight: bold">Total:</td>\n';
-    html += '<td id="total" style="font-weight:bold">' + total.toFixed(2) + '</td></tr>';
-    html += '</tbody></table>';
+    html += '<td id="total" style="font-weight:bold">' + total.toFixed(2) + '</td></tr>';    
+    html += '</tbody></table> \n';
+
+    if (totalPages > 1) {
+        html += '<div class="container body-container">';
+        html += '<ul class="pagination">';  //'<tr><td colspan="5"><ul class="pagination">';
+        for (var i = 1; i <= totalPages; i++) {
+            html += '<li';
+            if (i == currentPage)
+                html += ' class="active"';
+            html += '><a href="/Home/Index/' + i + '" ';
+            html += 'onclick="return pageClick(event, ' + i + ', ' + isAdmin + ');" >';
+            html += i;
+            html += '</a></li>';
+        }
+        html += '</ul>'; //</td></tr>';
+        html += '</div>';
+    }
+
     html += '<a class="btn btn-default" href="/">Back</a>';
 
     $(targetId).empty;
@@ -73,6 +94,25 @@
     google.charts.setOnLoadCallback(function () {
         drawChart(chartArray, chartId);
     });
+}
+
+function pageClick(event, page, isAdmin) {
+    event.preventDefault();
+    $.ajax({
+        type: "POST",
+        url: "/Home/Index",
+        data: {
+            "Customer" : $("#eCustomer").val(),
+            "Manager" : $("#eManager").val(),
+            "Product": $("#eProduct").val(),
+            "StartDate": $("#eStartDate").val(),
+            "EndDate": $("#eEndDate").val(),
+            "page" : page
+        }                    
+    }).done(function (res) {        
+        statisticsView(res, "#result", "chartContainer", isAdmin);        
+    });
+    return false;
 }
 
 function drawChart(data, chartId) {

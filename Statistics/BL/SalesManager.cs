@@ -40,23 +40,53 @@ namespace Statistics.BL
             return model;
         }
 
-        public IEnumerable<SaleViewModel> GetSales(SaleFilterModel filter, Func<IEnumerable<SaleDTO>, IOrderedEnumerable<SaleDTO>> orderBy = null)
-        {
+        public IEnumerable<SaleViewModel> GetSales(SaleFilterModel filter, Func<IQueryable<SaleDTO>, IOrderedQueryable<SaleDTO>> orderBy = null, PagerData pager = null)
+        {            
             var exp = PredicateBuilder.True<SaleDTO>();
             if (!string.IsNullOrEmpty(filter.Customer))
-                exp = exp.And(s => s.Customer.CustomerName.ToLower().Contains(filter.Customer.ToLower()));
+            {
+                string customer = filter.Customer.ToLower();
+                exp = exp.And(s => s.Customer.CustomerName.ToLower().Contains(customer));
+            }
             if (!string.IsNullOrEmpty(filter.Manager))
-                exp = exp.And(s => s.Manager.LastName.ToLower().Contains(filter.Manager.ToLower()));
+            {
+                string manager = filter.Manager.ToLower();
+                exp = exp.And(s => s.Manager.LastName.ToLower().Contains(manager));
+            }
             if (!string.IsNullOrEmpty(filter.Product))
-                exp = exp.And(s => s.Product.ProductName.ToLower().Contains(filter.Product.ToLower()));
+            {
+                string product = filter.Product.ToLower();
+                exp = exp.And(s => s.Product.ProductName.ToLower().Contains(product));
+            }
             if (filter.StartDate.HasValue)
-                exp = exp.And(s => s.SaleDate >= filter.StartDate.Value);
+            {
+                DateTime startDate = filter.StartDate.Value;
+                exp = exp.And(s => s.SaleDate >= startDate);
+            }
             if (filter.EndDate.HasValue)
-                exp = exp.And(s => s.SaleDate <= filter.EndDate.Value);
-            var sales = _unitOfWork.Sales.Get(exp.Compile(), orderBy);
+            {
+                DateTime endDate = filter.EndDate.Value;
+                exp = exp.And(s => s.SaleDate <= endDate);
+            }
+
+            if (orderBy == null)
+                orderBy = s => s.OrderBy(o => o.SaleDate);
+           
+            var sales = _unitOfWork.Sales.GetAsQueryable(exp, orderBy);
 
             if (sales != null)
-                return sales.Select(s => ViewModelFromDTO(s));
+            {
+                if (pager != null)
+                {
+                    int total = sales.Count();
+                    int rest = total % pager.ItemsPerPage;
+                    pager.TotalPages = total / pager.ItemsPerPage + (rest > 0 ? 1 : 0);
+                    int skip = pager.ItemsPerPage * (pager.CurrentPage - 1);
+                    sales = sales.Skip(skip).Take(pager.ItemsPerPage);
+                }
+
+                return sales.ToArray().Select(s => ViewModelFromDTO(s));
+            }
 
             return new SaleViewModel[0];
         }
@@ -123,7 +153,10 @@ namespace Statistics.BL
                         saleModel.Id = saved.Id;
                     return true;
                 }
-                catch { }                
+                catch (Exception e)
+                {
+
+                }                
             }
 
             return false;

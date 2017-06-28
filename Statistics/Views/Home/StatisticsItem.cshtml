@@ -2,36 +2,41 @@
 
 @model Statistics.Models.SaleViewModel
 
-@{ 
-    AjaxOptions editOptions = new AjaxOptions()
+    @if (Model != null)
     {
-        Url = Url.Action("EditSale", new { id = Model.Id }),
-        UpdateTargetId = string.Format("item_{0}", Model.Id),
-        HttpMethod = "GET"
-    };
-}
-<td>
-    @Html.DisplayFor(item => item.SaleDate)
-</td>
-<td>
-    @Html.DisplayFor(item => item.Manager)
-</td>
-<td>
-    @Html.DisplayFor(item => item.Customer)
-</td>
-<td>
-    @Html.DisplayFor(item => item.Product)
-</td>
-<td id="totalText_@Model.Id">
-    @Html.DisplayFor(item => item.Total)
-</td>
-<td>
-    @Html.HiddenFor(item => item.Id)
-    @if (MvcApplication.IsAdmin(Request.GetOwinContext(), User.Identity.Name))
-    {
-        @Ajax.ActionLink("Edit", "EditSale", new { id = Model.Id }, editOptions) @:|
-        <a href = "@Url.Action("DeleteSale", new { id = Model.Id })" id = "delLink_@Model.Id" onclick = "return delClick(@Model.Id);" > Delete </a>
-    }    
-</td>
+        AjaxOptions editOptions = new AjaxOptions()
+        {
+            Url = Url.Action("EditSale", new { id = Model.Id }),
+            UpdateTargetId = string.Format("item_{0}", Model.Id),
+            HttpMethod = "GET"
+        };
+
+        <td>
+            @Html.DisplayFor(item => item.SaleDate)
+        </td>
+        <td>
+            @Html.DisplayFor(item => item.Manager)
+        </td>
+        <td>
+            @Html.DisplayFor(item => item.Customer)
+        </td>
+        <td>
+            @Html.DisplayFor(item => item.Product)
+        </td>
+        <td id="totalText_@Model.Id">
+            @Html.DisplayFor(item => item.Total)
+        </td>
+        <td>
+            @Html.HiddenFor(item => item.Id)
+            @if (MvcApplication.IsAdmin(Request.GetOwinContext(), User.Identity.Name))
+            {
+                @Ajax.ActionLink("Edit", "EditSale", new { id = Model.Id }, editOptions) @:|
+                <a href="@Url.Action("DeleteSale", new { id = Model.Id })" id="delLink_@Model.Id" onclick="return delClick(@Model.Id);"> Delete </a>
+            }
+        </td>
+
+
+    }
+    
 
 

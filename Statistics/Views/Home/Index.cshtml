@@ -86,6 +86,7 @@
 <hr />
 <div id="chartContainer" style="text-align:center; margin: auto auto; width: 100%">
 </div>
+
 <script src="~/Scripts/jquery-1.10.2.intellisense.js"></script>
 @Scripts.Render("~/bundles/statistics")
 @section scripts
@@ -98,14 +99,15 @@
 
                 $.ajax({
                     type: "POST",
+                    url: "/Home/Index",
                     data: {
                         "Customer" : $("#eCustomer").val(),
                         "Manager" : $("#eManager").val(),
                         "Product": $("#eProduct").val(),
                         "StartDate": $("#eStartDate").val(),
-                        "EndDate": $("#eEndDate").val()
-                    },
-                    url: "Home/Index",
+                        "EndDate": $("#eEndDate").val(),
+                        "page" : @Model.page
+                    }                    
                 }).done(function (res) {
                     var isAdmin = @MvcApplication.IsAdmin(Request.GetOwinContext(), User.Identity.Name).ToString().ToLower();
                     statisticsView(res, "#result", "chartContainer", isAdmin);
