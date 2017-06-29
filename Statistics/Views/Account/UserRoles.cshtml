@@ -2,11 +2,16 @@
 
 @{
     ViewBag.Title = "User Roles";
+
+    //AjaxOptions opt = new AjaxOptions()
+    //{
+    //    UpdateTargetId = "roles_" + Model.UserId
+    //};
 }
 
 <h2>Roles for @Model.UserName</h2>
 
-<div class="form-horizontal">
+<div class="form-horizontal active">
     @using (Html.BeginForm())
     {
         @Html.HiddenFor(m => m.UserId)
@@ -23,8 +28,8 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <button id="bSave" type="submit" name="submit" value="Save" class="btn btn-default">Save</button>
-                <button id="bCancel" type="submit" name="submit" value="Cancel" class="btn">Cancel</button>
+                <button id="bSaveRoles_@Model.UserId" type="submit" name="submit" value="Save" class="btn btn-default">Save</button>
+                <button id="bCancelRoles_@Model.UserId" type="submit" name="submit" value="Cancel" class="btn">Cancel</button>
                 <button type="reset" class="btn">Reset</button>
             </div>
         </div>

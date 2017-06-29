@@ -32,6 +32,8 @@ namespace Statistics.Controllers
                 };
                 if (Session["ItemsPerPage"] != null)
                     model.ItemsPerPage = (int)Session["ItemsPerPage"];
+                else
+                    model.ItemsPerPage = MvcApplication.ItemsPerPage;
                 return View(model);
             }
 
@@ -101,7 +103,8 @@ namespace Statistics.Controllers
                 ErrorViewModel err = new ErrorViewModel()
                 {
                     Errors = new List<string>() { "Sale cannot be created..." },
-                    ReturnUrl = Url.Action("CreateSale")
+                    ReturnUrl = Url.Action("CreateSale"),
+                    UpdateTargetId = "newSale"
                 };
 
                 if (Request.IsAjaxRequest())

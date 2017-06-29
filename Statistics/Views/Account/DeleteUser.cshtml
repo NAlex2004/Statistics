@@ -41,7 +41,7 @@
 
         <div class="form-actions no-color">
             <input type="submit" value="Delete" class="btn btn-default" /> |
-            @Html.ActionLink("Cancel", "Users", "Account", new { @class = "btn btn-default" })
+            @Html.ActionLink("Cancel", "Users", "Account", new { page = (int?)Session["UsersPage"] }, new { @class = "btn btn-default" })
         </div>
     }
 </div>

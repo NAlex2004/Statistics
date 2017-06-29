@@ -12,17 +12,37 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Linq.Expressions;
 using System.Data.Entity;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
 
 namespace Statistics.Identity
 {    
     public class AccountManager : IAccountManager
     {
-        protected IQueryable<UserViewModel> GetUsers(IOwinContext owinContext)
+        public AccountManager()
+        {
+            var expr = Mapper.CreateMap<AppUser, UserViewModel>();
+            expr.ForAllMembers(m => m.Ignore());
+            expr.ForMember(dst => dst.Id, opt => opt.MapFrom(usr => usr.Id))
+                .ForMember(dst => dst.UserName, opt => opt.MapFrom(usr => usr.UserName))
+                .ForMember(dst => dst.LastName, opt => opt.MapFrom(usr => usr.LastName))
+                .ForMember(dst => dst.Email, opt => opt.MapFrom(usr => usr.Email));
+
+            var expr2 = Mapper.CreateMap<UserViewModel, AppUser>();
+            expr2.ForAllMembers(m => m.Ignore());
+            expr2.ForMember(dst => dst.Id, opt => opt.MapFrom(usr => usr.Id))
+                .ForMember(dst => dst.UserName, opt => opt.MapFrom(usr => usr.UserName))
+                .ForMember(dst => dst.LastName, opt => opt.MapFrom(usr => usr.LastName))
+                .ForMember(dst => dst.Email, opt => opt.MapFrom(usr => usr.Email));
+        }
+
+        protected IQueryable<UserViewModel> GetUsers(IOwinContext owinContext, Expression<Func<UserViewModel, bool>> condition)
         {
             AppUserManager userManager = owinContext.GetUserManager<AppUserManager>();
             AppRoleManager roleManager = owinContext.GetUserManager<AppRoleManager>();
+            Expression<Func<AppUser, bool>> expr = Mapper.Map<Expression<Func<AppUser, bool>>>(condition);
 
-            var users = userManager.Users
+            var users = userManager.Users.Where(expr)
                 .Select(u => new UserViewModel()
                 {
                     Id = u.Id,
@@ -39,7 +59,7 @@ namespace Statistics.Identity
         public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, 
             PagerData pager = null, Expression<Func<IQueryable<UserViewModel>, IOrderedQueryable<UserViewModel>>> orderBy = null)
         {
-            var query = orderBy == null ? GetUsers(owinContext).OrderBy(u => u.UserName) : orderBy.Compile()(GetUsers(owinContext));
+            var query = orderBy == null ? GetUsers(owinContext, u => true).OrderBy(u => u.UserName) : orderBy.Compile()(GetUsers(owinContext, u => true));
 
             if (pager == null)
                 return query.ToArray();
@@ -61,7 +81,7 @@ namespace Statistics.Identity
         public IEnumerable<UserViewModel> GetUsers(IOwinContext owinContext, Expression<Func<UserViewModel, bool>> condition,
             PagerData pager = null, Expression < Func<IQueryable<UserViewModel>, IOrderedQueryable<UserViewModel>>> orderBy = null)
         {
-            var query = GetUsers(owinContext).Where(condition);
+            var query = GetUsers(owinContext, condition);
             var orderedQuery = orderBy == null ? query.OrderBy(u => u.UserName)
                 : orderBy.Compile()(query);
             if (pager == null)

@@ -140,11 +140,12 @@ namespace Statistics.Controllers
             model.Password = model.PasswordConfirm = "";
 
             if (success)
-            {                
+            {
                 if (Request.IsAjaxRequest())
                     return PartialView("OneUser", model);
                 else
-                    return View("Users");
+                    Response.Redirect(Url.Action("Users", new { page = (int?)Session["UsersPage"] }), true);
+                return null;
             }
             
             if (Request.IsAjaxRequest())
@@ -186,27 +187,49 @@ namespace Statistics.Controllers
         }
 
         [Authorize(Roles = "administrators")]
-        public ActionResult Users(int? page = null)
-        {            
-            return View(page);
+        public ActionResult Users(int? page = null, string userName = null)
+        {
+            UsersFilterModel model = new UsersFilterModel()
+            {
+                Page = page,
+                UserName = userName
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "administrators")]
+        public ActionResult Users(UsersFilterModel model)
+        {
+            return View(model);
         }
 
         [Authorize(Roles = "administrators")]
-        public PartialViewResult UsersData(int? page = null)
+        public PartialViewResult UsersData(UsersFilterModel model)
         {
             PagerData pager = new PagerData()
             {
                 ItemsPerPage = MvcApplication.ItemsPerPage,
-                CurrentPage = page ?? 1
+                CurrentPage = model.Page ?? 1
             };
 
-            UsersListViewModel users = new UsersListViewModel()
+            IEnumerable<UserViewModel> users;
+            if (model.UserName != null)
+            {
+                string userName = model.UserName.ToLower();
+                users = _accountManager.GetUsers(HttpContext.GetOwinContext(), u => u.UserName.ToLower().Contains(userName), pager);
+            }
+            else
+                users = _accountManager.GetUsers(HttpContext.GetOwinContext(), pager);
+
+            UsersListViewModel usersModel = new UsersListViewModel()
             {
                 Pager = pager,
-                Users = _accountManager.GetUsers(HttpContext.GetOwinContext(), pager)
+                Users = users
             };
-
-            return PartialView(users);
+            Session["UsersPage"] = pager.CurrentPage;
+            return PartialView(usersModel);
         }
 
         [Authorize(Roles = "administrators")]
@@ -278,7 +301,11 @@ namespace Statistics.Controllers
         {
             var result = _accountManager.DeleteUser(HttpContext.GetOwinContext(), model.Id);
             if (result.Succeeded)
-                return RedirectToAction("Users");
+            {
+                if (Request.IsAjaxRequest())
+                    return Json(string.Format("User {0} deleted.", model.UserName));
+                return RedirectToAction("Users", new { page = (int?)Session["UsersPage"] });
+            }                
 
             ErrorViewModel errorModel = new ErrorViewModel()
             {
@@ -325,6 +352,9 @@ namespace Statistics.Controllers
                 return null;
             RolesViewModel model = CreateRolesModel(user);
 
+            //if (Request.IsAjaxRequest())
+            //    return PartialView(model);
+
             return View(model);
         }
 
@@ -341,15 +371,20 @@ namespace Statistics.Controllers
                     ErrorViewModel errModel = new ErrorViewModel()
                     {
                         Errors = new List<string>(),
-                        ReturnUrl = Url.Action("Users")
+                        ReturnUrl = Url.Action("Users"),
+                        UpdateTargetId = "roles_" + model.UserId
                     };
                     foreach (var error in res.Errors)
                         errModel.Errors.Add(error);
+                    //if (Request.IsAjaxRequest())
+                    //    return PartialView("ErrorView", errModel);
                     return View("ErrorView", errModel);
                 }
             }
 
-            return RedirectToAction("Users");
+            //if (Request.IsAjaxRequest())
+            //    return null;
+            return RedirectToAction("Users", new { page = (int?)Session["UsersPage"] });
         }
     }
 }

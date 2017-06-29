@@ -200,6 +200,7 @@
     <Compile Include="Models\Identity\ChangePasswordViewModel.cs" />
     <Compile Include="Models\Identity\ErrorViewModel.cs" />
     <Compile Include="Models\Identity\LoginViewModel.cs" />
+    <Compile Include="Models\Identity\UsersFilterModel.cs" />
     <Compile Include="Models\PagerData.cs" />
     <Compile Include="Models\Identity\RolesViewModel.cs" />
     <Compile Include="Models\Identity\UsersListViewModel.cs" />

@@ -41,7 +41,24 @@
 
     <p>
         @Ajax.ActionLink("Edit", "EditUser", new { id = Model.Id }, editOptions) |
-        @Html.ActionLink("Delete", "DeleteUser", new { id = Model.Id })
+        @Html.ActionLink("Delete", "DeleteUser", new { id = Model.Id }, new { onclick="return deleteUser(event, '" + Model.Id + "');"})
     </p>
 </div>
 
+<script type="text/javascript">
+    function deleteUser(event, userId) {
+        event.preventDefault();
+        if (confirm("Delete this user?")) {
+            $.ajax({
+                type: "POST",
+                url: "/Account/DeleteUser",
+                data: {
+                    "id": userId
+                }
+            }).done(function (res) {
+                $("#" + userId).html(res);
+            });
+        }
+        return false;
+    }
+</script>
