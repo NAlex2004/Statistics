@@ -351,10 +351,6 @@ namespace Statistics.Controllers
             if (user == null)
                 return null;
             RolesViewModel model = CreateRolesModel(user);
-
-            //if (Request.IsAjaxRequest())
-            //    return PartialView(model);
-
             return View(model);
         }
 
@@ -376,14 +372,11 @@ namespace Statistics.Controllers
                     };
                     foreach (var error in res.Errors)
                         errModel.Errors.Add(error);
-                    //if (Request.IsAjaxRequest())
-                    //    return PartialView("ErrorView", errModel);
+
                     return View("ErrorView", errModel);
                 }
             }
 
-            //if (Request.IsAjaxRequest())
-            //    return null;
             return RedirectToAction("Users", new { page = (int?)Session["UsersPage"] });
         }
     }

@@ -4,8 +4,7 @@
     var html = "<h2>Sales</h2> \n";
     html += '<input id="page" name="page" type="hidden" value="' + data.CurrentPage + '" /> \n';
     if (isAdmin)
-        html += '<p><a data-ajax="true" data-ajax-method="GET" data-ajax-mode="replace" data-ajax-update="#newSale" data-ajax-url="/Home/CreateSale" href="/Home/CreateSale">Add New sale</a></p> \n';
-        //html += "<p><a href='/Home/CreateSale'>Add New sale</a></p> \n";
+        html += '<p><a data-ajax="true" data-ajax-method="GET" data-ajax-mode="replace" data-ajax-update="#newSale" data-ajax-url="/Home/CreateSale" href="/Home/CreateSale">Add New sale</a></p> \n';        
     html += '<table class="table"> \n'
         + '<thead id="resultHead"><tr> \n'
         + '<th>Sale date</th> \n'
@@ -66,7 +65,7 @@
 
     if (totalPages > 1) {
         html += '<div class="container body-container">';
-        html += '<ul class="pagination">';  //'<tr><td colspan="5"><ul class="pagination">';
+        html += '<ul class="pagination">';  
         for (var i = 1; i <= totalPages; i++) {
             html += '<li';
             if (i == currentPage)
@@ -76,7 +75,7 @@
             html += i;
             html += '</a></li>';
         }
-        html += '</ul>'; //</td></tr>';
+        html += '</ul>'; 
         html += '</div>';
     }
 

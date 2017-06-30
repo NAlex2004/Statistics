@@ -111,11 +111,7 @@ namespace Statistics.Controllers
                     return PartialView("ErrorView", err);
                 return View("ErrorView", err);
             }
-
-
-            //Response.Redirect(Url.Action("CreateSale", new { createdId = model.Id }), true);
-            //return null;
-
+            
             return RedirectToAction("CreateSale", new { createdId = model.Id });
         }
 
