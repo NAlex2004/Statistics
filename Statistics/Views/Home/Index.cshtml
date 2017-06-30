@@ -8,6 +8,7 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> 
 
 <div style="display:table; width:100%;">
+    
         <div style="display: table-cell; width:65%;">
             @using (Html.BeginForm())
             {
@@ -112,7 +113,7 @@
 
             function bFindClick(o) {
                 o.preventDefault();
-
+                var page = $("#page").val();
                 $.ajax({
                     type: "POST",
                     url: "/Home/Index",
@@ -123,7 +124,7 @@
                         "StartDate": $("#eStartDate").val(),
                         "EndDate": $("#eEndDate").val(),
                         "ItemsPerPage" : $("#dlItemsPerPage").val(),
-                        "page" : @Model.page
+                        "page" : page
                     }                    
                 }).done(function (res) {
                     var isAdmin = @MvcApplication.IsAdmin(Request.GetOwinContext(), User.Identity.Name).ToString().ToLower();

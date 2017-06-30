@@ -9,7 +9,7 @@
 }
 
 <h2>Sales</h2>
-
+<input id="page" name="page" type="hidden" value="@Model.Pager.CurrentPage" />
 <p>
     @if (MvcApplication.IsAdmin(Request.GetOwinContext(), User.Identity.Name))
     {
